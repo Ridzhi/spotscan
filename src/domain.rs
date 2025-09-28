@@ -4,8 +4,8 @@
 
 use std::collections::HashMap;
 use time::{Duration, Time};
-use crate::spot::Slot;
 
+pub type TgUsername = String;
 pub type TgUserId = i64;
 pub type TgAccessHash = i64;
 
