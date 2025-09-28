@@ -3,8 +3,35 @@
 // непрерывные слоты
 
 use std::collections::HashMap;
-use time::Time;
+use time::{Duration, Time};
+use crate::spot::Slot;
 
+pub type TgUserId = i64;
+pub type TgAccessHash = i64;
+
+pub struct User {
+    pub id: i64,
+    pub tg_user_id: TgUserId,
+    pub tg_user_access_hash: TgAccessHash,
+}
+
+pub struct Settings {
+    pub is_active: bool,
+    pub defaults: WindowDefaults,
+    pub slots: HashMap<time::Weekday, WindowSettings>,
+}
+
+pub struct WindowDefaults {
+    pub duration: Duration,
+    pub starts: Option<Time>,
+    pub ends: Option<Time>,
+}
+
+pub struct WindowSettings {
+    pub duration: Duration,
+    pub starts: Time,
+    pub ends: Time,
+}
 // слот должен проходить проверку на:
 //  - начинается не раньше указанной границы
 //  - заканчивается не позже указанной границы
