@@ -1,0 +1,39 @@
+services:
+  pg_tpl:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: ${SPOTSCAN_PG_USER}
+      POSTGRES_PASSWORD: ${SPOTSCAN_PG_PASSWORD}
+      POSTGRES_DB: ${SPOTSCAN_PG_DBNAME}
+
+  pg_prod:
+    extends:
+      service: pg_tpl
+    profiles:
+      - prod
+    container_name: spotscan_pg_prod
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+    ports:
+      - "${SPOTSCAN_PG_PORT}:5432"
+
+  pg_dev:
+    extends:
+      service: pg_tpl
+    profiles:
+      - dev
+    container_name: spotscan_pg_dev
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+    ports:
+      - "${SPOTSCAN_PG_PORT}:5432"
+
+networks:
+  default:
+    name: spotscan_network
+    external: true
+
+volumes:
+  pgdata:
