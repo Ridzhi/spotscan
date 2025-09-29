@@ -47,6 +47,10 @@ export const useIndexStore = defineStore('index', () => {
         loaded = true;
     }
 
+    const defaultDuration = computed(() => {
+        return '' + parseInt(user.value.settings.defaults.duration);
+    })
+
     const vanTheme = computed<ConfigProviderTheme>(() => {
         // use to trigger vantTheme change
         const _ = themeTrigger.value;
@@ -87,17 +91,15 @@ export const useIndexStore = defineStore('index', () => {
             '5400': 'Полтора часа',
             '7200': 'Два часа',
             '9000': 'Два с половиной часа',
-            '10000': 'Три часа',
             '10800': 'Три часа',
         };
 
-        const duration = '' + parseInt(user.value.settings.defaults.duration) as keyof typeof lookup;
-
-        return lookup[duration] || 'Непонятно';
+        return lookup[defaultDuration.value as keyof typeof lookup] || 'Непонятно';
     })
 
     return {
         user,
+        defaultDuration,
         vanTheme,
         themeHuman,
         defaultDurationHuman,
