@@ -1,13 +1,15 @@
-pub mod config;
-pub mod store;
-
 use self::config::Config;
 use deadpool_postgres::Pool;
 use std::sync::{Arc, OnceLock};
+use store::*;
+
+pub mod config;
+pub mod store;
 
 pub struct AppState {
     config: Factory<Arc<Config>>,
     pg: Factory<Arc<Pool>>,
+    user_store: Factory<Arc<UserStore>>,
 }
 
 impl AppState {
@@ -17,6 +19,10 @@ impl AppState {
 
     pub fn pg(&self) -> Arc<Pool> {
         self.resolve(&self.pg)
+    }
+
+    pub fn user_store(&self) -> Arc<UserStore> {
+        self.resolve(&self.user_store)
     }
 }
 
@@ -32,6 +38,7 @@ impl Default for AppState {
 
                 Arc::new(pool)
             }),
+            user_store: Factory::once(|state| Arc::new(UserStore::new(state.pg()))),
         }
     }
 }
