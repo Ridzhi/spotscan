@@ -8,7 +8,6 @@ use serde::Serializer;
 use serde_derive::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::collections::HashMap;
-use std::ops::Deref;
 use time::PrimitiveDateTime;
 use time::macros::time;
 use time::{Duration, Time, Weekday};
