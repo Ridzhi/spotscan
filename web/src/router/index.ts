@@ -17,6 +17,11 @@ export const routes = [
         component: () => import('@/views/ThemeView.vue'),
       },
       {
+        path: '/defaults/duration',
+        name: 'defaults-duration',
+        component: () => import('@/views/DefaultsDurationView.vue'),
+      },
+      {
         path: '/error',
         name: 'error',
         component: () => import('@/views/ErrorPage.vue'),

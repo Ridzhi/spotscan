@@ -39,6 +39,19 @@ async function onSwitchEnabled(enabled: boolean) {
 
     <MainGap />
 
+    <van-cell-group inset title="Фильтры по умолчанию">
+      <van-cell
+          title="Продолжительность окна"
+          clickable
+          center
+          is-link
+          :value="store.defaultDurationHuman"
+          :to="{name: 'defaults-duration'}"
+      />
+    </van-cell-group>
+
+    <MainGap />
+
     <van-cell-group inset>
       <van-cell
           title="Тема"

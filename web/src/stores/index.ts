@@ -80,10 +80,27 @@ export const useIndexStore = defineStore('index', () => {
         return lookup[user.value.settings.app_theme];
     })
 
+    const defaultDurationHuman = computed(() => {
+        const lookup = {
+            '1800': 'Пол часа',
+            '3600': 'Час',
+            '5400': 'Полтора часа',
+            '7200': 'Два часа',
+            '9000': 'Два с половиной часа',
+            '10000': 'Три часа',
+            '10800': 'Три часа',
+        };
+
+        const duration = '' + parseInt(user.value.settings.defaults.duration) as keyof typeof lookup;
+
+        return lookup[duration] || 'Непонятно';
+    })
+
     return {
         user,
         vanTheme,
         themeHuman,
+        defaultDurationHuman,
         load,
     }
 });
