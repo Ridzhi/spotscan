@@ -2,28 +2,34 @@
 // площадка
 // непрерывные слоты
 
-use std::collections::HashMap;
-use time::{Duration, Time, Weekday};
-use std::borrow::Cow;
-use std::ops::Deref;
 use grammers_client::{session::PackedType, types::PackedChat};
 use sea_query::SimpleExpr;
 use serde::Serializer;
 use serde_derive::{Deserialize, Serialize};
+use std::borrow::Cow;
+use std::collections::HashMap;
+use std::ops::Deref;
 use time::PrimitiveDateTime;
+use time::macros::time;
+use time::{Duration, Time, Weekday};
 use tokio_postgres::types::{FromSql, ToSql};
+use utoipa::openapi::{RefOr, Schema, SchemaFormat, schema};
 use utoipa::{PartialSchema, ToSchema};
-use utoipa::openapi::{schema, RefOr, Schema, SchemaFormat};
 
 pub type TgUsername = String;
 pub type TgUserId = i64;
 pub type TgAccessHash = i64;
 
-
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppTime(pub Time);
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct AppWeekDay(pub Weekday);
+
+impl From<Weekday> for AppWeekDay {
+    fn from(weekday: Weekday) -> Self {
+        Self(weekday)
+    }
+}
 
 pub struct TgUser {
     pub id: TgUserId,
@@ -38,12 +44,59 @@ pub struct User {
     pub created_at: UtcDateTime,
 }
 
+impl User {
+    pub fn new(tg_user_id: TgUserId, tg_user_access_hash: TgAccessHash) -> Self {
+        Self {
+            id: 0,
+            tg_user_id,
+            tg_user_access_hash,
+            settings: Settings::default(),
+            created_at: Default::default(),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, ToSchema)]
 pub struct Settings {
-    pub is_active: bool,
+    pub enabled: bool,
     pub app_theme: AppTheme,
     pub defaults: WindowDefaults,
     pub slots: HashMap<AppWeekDay, WindowSettings>,
+}
+
+impl Default for Settings {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            app_theme: AppTheme::System,
+            defaults: WindowDefaults {
+                duration: Duration::minutes(120),
+                starts: AppTime(time!(10:00)),
+                ends: AppTime(time!(20:00)),
+            },
+            slots: HashMap::from([
+                (Weekday::Monday.into(), WindowSettings::default()),
+                (Weekday::Tuesday.into(), WindowSettings::default()),
+                (Weekday::Wednesday.into(), WindowSettings::default()),
+                (Weekday::Thursday.into(), WindowSettings::default()),
+                (Weekday::Friday.into(), WindowSettings::default()),
+                (
+                    Weekday::Saturday.into(),
+                    WindowSettings {
+                        enabled: true,
+                        ..WindowSettings::default()
+                    },
+                ),
+                (
+                    Weekday::Sunday.into(),
+                    WindowSettings {
+                        enabled: true,
+                        ..WindowSettings::default()
+                    },
+                ),
+            ]),
+        }
+    }
 }
 
 pub enum UserOption {
@@ -55,15 +108,16 @@ pub type UserOptions = Vec<UserOption>;
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug)]
 pub struct WindowDefaults {
     pub duration: Duration,
-    pub starts: Option<AppTime>,
-    pub ends: Option<AppTime>,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, ToSchema)]
-pub struct WindowSettings {
-    pub duration: Duration,
     pub starts: AppTime,
     pub ends: AppTime,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, ToSchema, Default)]
+pub struct WindowSettings {
+    pub enabled: bool,
+    pub duration: Option<Duration>,
+    pub starts: Option<AppTime>,
+    pub ends: Option<AppTime>,
 }
 // слот должен проходить проверку на:
 //  - начинается не раньше указанной границы
@@ -98,8 +152,6 @@ pub type Schedule = HashMap<u8, Vec<TimeWindow>>;
 //     pub number: u8,
 //     pub time_windows: Vec<TimeWindow>
 // }
-
-
 
 #[derive(Clone, Debug)]
 pub struct TimeWindow {
@@ -137,7 +189,9 @@ impl ToSchema for AppWeekDay {
     }
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, FromSql, ToSql, strum::Display)]
+#[derive(
+    Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, FromSql, ToSql, strum::Display,
+)]
 #[postgres(name = "app_theme")]
 pub enum AppTheme {
     #[postgres(name = "LIGHT")]

@@ -7,6 +7,12 @@ use thiserror::Error;
 pub enum ErrorKind {
     #[error("invalid request")]
     InvalidRequest,
+    #[error("on first visit user already exists")]
+    OnFirstVisitUserAlreadyExists,
+    #[error("on first visit user save failed")]
+    OnFirstVisitUserSaveFailed,
+    #[error("on first visit user find failed")]
+    OnFirstVisitUserFindFailed,
 }
 
 pub type Result<T, E = AppError> = std::result::Result<T, E>;
