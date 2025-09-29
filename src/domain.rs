@@ -169,7 +169,7 @@ impl PartialSchema for AppTime {
 
 impl ToSchema for AppTime {
     fn name() -> Cow<'static, str> {
-        Cow::Borrowed("time::Time")
+        Cow::Borrowed("Time")
     }
 }
 

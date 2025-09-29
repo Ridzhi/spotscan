@@ -22,3 +22,5 @@ down:
 migrate:
 	refinery migrate -e DB_URI -p ./migrations
 
+api:
+	openapi-generator generate -i docs/openapi.json -g typescript-axios -o web/src/utils/openapi

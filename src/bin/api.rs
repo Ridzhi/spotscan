@@ -13,7 +13,7 @@ use spotscan::{handler, prelude::*};
 async fn main() {
     #[derive(OpenApi)]
     #[openapi(
-        info(title = "spotscan.io", license(identifier = "GPL")),
+        info(title = "spotscan", license(identifier = "GPL")),
 
     )]
     struct ApiDoc;
