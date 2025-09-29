@@ -41,7 +41,7 @@ async function onSwitchEnabled(enabled: boolean) {
 
     <van-cell-group inset title="Фильтры по умолчанию">
       <van-cell
-          title="Продолжительность окна"
+          title="Длина окна"
           clickable
           center
           is-link
