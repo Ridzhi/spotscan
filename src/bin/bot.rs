@@ -1,6 +1,5 @@
 use spotscan::prelude::*;
 use std::{env, pin::pin, sync::Arc};
-
 use deadpool_postgres::Pool;
 use futures_util::future::{Either, select};
 use grammers_client::{
@@ -16,7 +15,7 @@ const SESSION_FILE: &str = "bot.session";
 
 fn main() -> Result<()> {
     env_logger::init();
-
+    
     runtime::Builder::new_current_thread()
         .enable_all()
         .build()
