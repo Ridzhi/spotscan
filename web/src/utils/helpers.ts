@@ -11,6 +11,22 @@ export const timesRange = (start: number, end: number): string[] => {
     return out;
 }
 
+export type Weekday = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+
+export const weekDay = (v: Weekday): string =>  {
+    const lookup = {
+        'Monday': 'Понедельник',
+        'Tuesday': 'Вторник',
+        'Wednesday': 'Среда',
+        'Thursday': 'Четверг',
+        'Friday': 'Пятница',
+        'Saturday': 'Суббота',
+        'Sunday': 'Воскресенье',
+    };
+
+    return lookup[v];
+}
+
 function numToTime(v: number): string {
     let [h, m = '00'] = (v.toString()).split('.');
 
@@ -24,3 +40,4 @@ function numToTime(v: number): string {
 
     return `${h}:${m}`;
 }
+

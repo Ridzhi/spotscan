@@ -5,10 +5,34 @@ import {ref} from "vue";
 import {showNotify} from "vant";
 import {api} from "@/utils/api";
 import MainGap from "@/components/MainGap.vue";
+import {type Weekday, weekDay} from "@/utils/helpers";
+import type {WindowSettings} from "@/utils/openapi";
 
 const store = useIndexStore();
 
+const days: Weekday[] = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+];
+
+
 const enabled = ref(store.user.settings.enabled);
+const daysEnabled = ref(getDaysEnabled());
+
+function getDaysEnabled(): Partial<Record<Weekday, boolean>> {
+  let out: Partial<Record<Weekday, boolean>> = {};
+
+  Object.entries(store.user.settings.slots).forEach(([key, value]) => {
+    out[key as Weekday] = value.enabled;
+  })
+
+  return out;
+}
 
 async function onSwitchEnabled(enabled: boolean) {
   try {
@@ -64,6 +88,18 @@ async function onSwitchEnabled(enabled: boolean) {
           :value="store.defaultEnds"
           :to="{name: 'defaults-ends'}"
       />
+    </van-cell-group>
+
+    <MainGap />
+
+    <van-cell-group inset>
+      <template v-for="(day, index) in days" :key="index">
+        <van-cell center :title="weekDay(day)">
+          <template #right-icon>
+            <van-switch v-model="daysEnabled[day]" @change="onSwitchEnabled " />
+          </template>
+        </van-cell>
+      </template>
     </van-cell-group>
 
     <MainGap />
