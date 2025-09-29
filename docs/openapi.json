@@ -1,0 +1,267 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "spotscan",
+    "description": "",
+    "license": {
+      "name": "",
+      "identifier": "GPL"
+    },
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/v1/user": {
+      "get": {
+        "operationId": "get_user",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Res"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/user/settings": {
+      "patch": {
+        "operationId": "update_user_settings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserSettingsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Res"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AppTheme": {
+        "type": "string",
+        "enum": [
+          "Light",
+          "Dark",
+          "System"
+        ]
+      },
+      "Res": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "Settings": {
+        "type": "object",
+        "required": [
+          "enabled",
+          "app_theme",
+          "defaults",
+          "slots"
+        ],
+        "properties": {
+          "app_theme": {
+            "$ref": "#/components/schemas/AppTheme"
+          },
+          "defaults": {
+            "$ref": "#/components/schemas/WindowDefaults"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "slots": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/WindowSettings"
+            },
+            "propertyNames": {
+              "type": "string",
+              "format": "time::Weekday"
+            }
+          }
+        }
+      },
+      "Time": {
+        "type": "string",
+        "format": "[hour]:[minute]"
+      },
+      "UpdateUserSettingsRequest": {
+        "type": "object",
+        "properties": {
+          "app_theme": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/AppTheme"
+              }
+            ]
+          },
+          "enabled": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "slots": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "$ref": "#/components/schemas/WindowSettings"
+            },
+            "propertyNames": {
+              "type": "string",
+              "format": "time::Weekday"
+            }
+          },
+          "window_default_duration": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "window_default_ends": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Time"
+              }
+            ]
+          },
+          "window_default_starts": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Time"
+              }
+            ]
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "required": [
+          "id",
+          "tg_user_id",
+          "tg_user_access_hash",
+          "settings",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "$ref": "#/components/schemas/UtcDateTime"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/Settings"
+          },
+          "tg_user_access_hash": {
+            "$ref": "#/components/schemas/i64"
+          },
+          "tg_user_id": {
+            "$ref": "#/components/schemas/i64"
+          }
+        }
+      },
+      "UtcDateTime": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "WindowDefaults": {
+        "type": "object",
+        "required": [
+          "duration",
+          "starts",
+          "ends"
+        ],
+        "properties": {
+          "duration": {
+            "type": "string"
+          },
+          "ends": {
+            "$ref": "#/components/schemas/Time"
+          },
+          "starts": {
+            "$ref": "#/components/schemas/Time"
+          }
+        }
+      },
+      "WindowSettings": {
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "properties": {
+          "duration": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "ends": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Time"
+              }
+            ]
+          },
+          "starts": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Time"
+              }
+            ]
+          }
+        }
+      },
+      "i64": {
+        "type": "integer",
+        "format": "int64"
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+.gitignore
+.npmignore
+api.ts
+base.ts
+common.ts
+configuration.ts
+docs/AppTheme.md
+docs/DefaultApi.md
+docs/Res.md
+docs/Settings.md
+docs/UpdateUserSettingsRequest.md
+docs/User.md
+docs/WindowDefaults.md
+docs/WindowSettings.md
+git_push.sh
+index.ts

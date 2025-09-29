@@ -1,0 +1,236 @@
+:root {
+    --light-factor: .15;
+    --ton-brand-color: #0098EA;
+    --color-success-light: hsl(from var(--van-success-color) h s l / var(--light-factor));
+    --color-danger-light: hsl(from var(--van-danger-color) h s l / var(--light-factor));
+}
+
+/* van overrides */
+:root:root {
+    --van-radius-lg: 16px;
+
+    --van-tabbar-height: 76px;
+    --van-search-input-height: 48px;
+    --van-search-padding: var(--van-padding-sm) 0;
+    --van-switch-size: 22px;
+
+    .van-search__content--square {
+        border-radius: var(--van-radius-lg);
+    }
+
+    .van-cell.van-field {
+        border-radius: var(--van-radius-lg);
+    }
+
+}
+
+.app-screen, .popup-n-1, .popup-n-3, .popup-n-5  {
+    --van-popup-background: var(--van-background);
+    --van-action-sheet-item-background: var(--van-background);
+    --van-search-background: var(--van-background);
+    --van-search-content-background: var(--van-background-2);
+}
+
+.popup-n-0, .popup-n-2, .popup-n-4 {
+    --van-popup-background: var(--van-background-2);
+    --van-action-sheet-item-background: var(--van-background-2);
+    --van-search-background: var(--van-background-2);
+    --van-search-content-background: var(--van-background);
+    --van-cell-background: var(--van-background);
+}
+/*html, #app, body {*/
+/*    height: 100%;*/
+/*}*/
+
+body {
+    font-family: -apple-system, 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.5;
+
+    background: var(--van-background);
+    color: var(--van-text-color);
+}
+
+a, a:visited {
+    color: var(--van-primary-color);
+}
+
+blockquote {
+    margin: 0;
+}
+
+blockquote p {
+    padding: 15px;
+    background: #eee;
+    border-radius: 5px;
+}
+
+pre {
+    overflow: auto;
+}
+
+h1 {
+    font-size: 28px;
+    line-height: 34px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+h3 {
+    line-height: 21px;
+    font-weight: 400;
+    margin-bottom: 5px;
+}
+
+
+input {
+    font-weight: 400 !important;
+}
+
+.h2 {
+    font-weight: 500;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-primary {
+    color: var(--van-primary-color);
+}
+
+.text-secondary {
+    color: var(--van-text-color-2);
+}
+
+.text-negative {
+    color: var(--van-danger-color);
+}
+
+.text-positive {
+    color: var(--van-success-color);
+}
+
+.text-subtitle {
+    font-size: var(--van-font-size-lg);
+}
+
+.text-section-subtitle {
+    font-size: 13px;
+}
+
+.text-sm {
+    font-size: var(--van-font-size-sm);
+}
+
+.no-padding {
+    padding: 0 !important;
+}
+
+.no-margin {
+    margin: 0 !important;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.col {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--van-padding-md) / 2);
+}
+
+.col-gap-md {
+    gap: var(--van-padding-md);
+}
+
+.x-align-sb {
+    justify-content: space-between;
+}
+
+.y-align-baseline {
+    align-items: baseline;
+}
+
+.x-align-center {
+    justify-content: center;
+}
+
+.content {
+    width: 100%;
+    margin: 0 var(--van-padding-md);
+}
+
+
+.gmi {
+    position: relative;
+    display: inline-block;
+    font-family: 'Material Icons',serif;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+    text-rendering: auto;
+    vertical-align: middle;
+}
+.gmi-shopping_cart::before {
+    content: 'shopping_cart';
+}
+
+.gmi-sell::before {
+    content: 'sell';
+}
+
+.gmi-price_change::before {
+    content: 'price_change';
+}
+
+.gmi-wallet::before {
+    content: 'wallet';
+}
+
+.gmi-close::before {
+    content: 'close';
+}
+
+.gmi-book::before {
+    content: 'book';
+}
+
+.gmi-delete::before {
+    content: 'delete';
+}
+
+.gmi-content_copy::before {
+    content: 'content_copy';
+}
+
+.gmi-more_vert::before {
+    content: 'more_vert';
+}
+
+.gmi-notifications_active::before {
+    content: 'notifications_active';
+}
+
+.gmi-query_stats:before {
+    content: 'query_stats';
+}
+
+.gmi-add::before {
+    content: 'add';
+}
+
+.gmi-settings::before {
+    content: 'settings';
+}
+
+.gmi-trending_up::before {
+    content: 'trending_up';
+}
+
+.gmi-trending_down::before {
+    content: 'trending_down';
+}
