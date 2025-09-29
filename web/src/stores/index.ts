@@ -49,7 +49,15 @@ export const useIndexStore = defineStore('index', () => {
 
     const defaultDuration = computed(() => {
         return '' + parseInt(user.value.settings.defaults.duration);
-    })
+    });
+
+    const defaultStarts = computed(() => {
+        return user.value.settings.defaults.starts.slice(0, -5);
+    });
+
+    const defaultEnds = computed(() => {
+        return user.value.settings.defaults.ends.slice(0, -5);
+    });
 
     const vanTheme = computed<ConfigProviderTheme>(() => {
         // use to trigger vantTheme change
@@ -100,6 +108,8 @@ export const useIndexStore = defineStore('index', () => {
     return {
         user,
         defaultDuration,
+        defaultStarts,
+        defaultEnds,
         vanTheme,
         themeHuman,
         defaultDurationHuman,

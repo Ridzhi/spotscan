@@ -48,6 +48,22 @@ async function onSwitchEnabled(enabled: boolean) {
           :value="store.defaultDurationHuman"
           :to="{name: 'defaults-duration'}"
       />
+      <van-cell
+          title="Время, от"
+          clickable
+          center
+          is-link
+          :value="store.defaultStarts"
+          :to="{name: 'defaults-starts'}"
+      />
+      <van-cell
+          title="Время, до"
+          clickable
+          center
+          is-link
+          :value="store.defaultEnds"
+          :to="{name: 'defaults-ends'}"
+      />
     </van-cell-group>
 
     <MainGap />
