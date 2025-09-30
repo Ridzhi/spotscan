@@ -102,6 +102,8 @@ impl UserStore {
         for o in ops {
             q.and_where(match o {
                 UserOption::TgUserId(v) => Expr::col(UserIden::TgUserId).eq(v),
+                UserOption::Enabled(v) => SimpleExpr::Custom("(settings -> 'enabled')::bool = true".to_string())
+                    .and(SimpleExpr::Custom(format!("(settings -> 'slots' -> '{v}' -> 'enabled')::bool = true"))),
             });
         }
 

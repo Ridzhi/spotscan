@@ -1,6 +1,7 @@
 use serde_derive::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::ops::Deref;
 use time::PrimitiveDateTime;
 use time::macros::time;
 use time::{Duration, Time, Weekday};
@@ -14,6 +15,20 @@ pub type TgAccessHash = i64;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppTime(pub Time);
+
+impl From<Time> for AppTime {
+    fn from(t: Time) -> AppTime {
+        AppTime(t)
+    }
+}
+
+impl Deref for AppTime {
+    type Target = Time;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct AppWeekDay(pub Weekday);
 
@@ -37,6 +52,17 @@ pub struct User {
 }
 
 impl User {
+    pub fn match_window(&self, d: Weekday, w: &TimeWindow) -> bool {
+        self.settings.get_starts(d).ge(&w.start)
+            && self.settings.get_ends(d).le(&w.end)
+            && self
+                .settings
+                .get_duration(d)
+                .le(&w.end.duration_until(w.start))
+    }
+}
+
+impl User {
     pub fn new(tg_user_id: TgUserId, tg_user_access_hash: TgAccessHash) -> Self {
         Self {
             id: 0,
@@ -54,6 +80,34 @@ pub struct Settings {
     pub app_theme: AppTheme,
     pub defaults: WindowDefaults,
     pub slots: HashMap<AppWeekDay, WindowSettings>,
+}
+
+impl Settings {
+    pub fn get_duration(&self, day: Weekday) -> Duration {
+        self.slots
+            .get(&day.into())
+            .expect("day.weekday out of bounds")
+            .duration
+            .unwrap_or(self.defaults.duration)
+    }
+
+    pub fn get_starts(&self, day: Weekday) -> AppTime {
+        self.slots
+            .get(&day.into())
+            .expect("day.weekday out of bounds")
+            .starts
+            .clone()
+            .unwrap_or(self.defaults.starts.clone())
+    }
+
+    pub fn get_ends(&self, day: Weekday) -> AppTime {
+        self.slots
+            .get(&day.into())
+            .expect("day.weekday out of bounds")
+            .ends
+            .clone()
+            .unwrap_or(self.defaults.ends.clone())
+    }
 }
 
 impl Default for Settings {
@@ -93,6 +147,7 @@ impl Default for Settings {
 
 pub enum UserOption {
     TgUserId(TgUserId),
+    Enabled(Weekday),
 }
 
 pub type UserOptions = Vec<UserOption>;
