@@ -125,7 +125,7 @@ impl Settings {
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            enabled: true,
+            enabled: false,
             app_theme: AppTheme::System,
             defaults: WindowDefaults {
                 duration: Duration::minutes(120),
