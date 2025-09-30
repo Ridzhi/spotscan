@@ -32,6 +32,11 @@ export const routes = [
         component: () => import('@/views/DefaultsEndsView.vue'),
       },
       {
+        path: '/day/:day',
+        name: 'day',
+        component: () => import('@/views/DayView.vue'),
+      },
+      {
         path: '/error',
         name: 'error',
         component: () => import('@/views/ErrorPage.vue'),

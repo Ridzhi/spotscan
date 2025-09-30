@@ -45,6 +45,22 @@ async function onSwitchEnabled(enabled: boolean) {
     showNotify("Что то пошло не так");
   }
 }
+
+async function onSwitchDayEnabled(day: Weekday, enabled: boolean) {
+  try {
+    const res = await api.updateUserSettings({
+      slots: {
+        [day]: {
+          enabled
+        }
+      }
+    });
+
+    store.user = res.data.data;
+  } catch {
+    showNotify("Что то пошло не так");
+  }
+}
 </script>
 
 <template>
@@ -94,9 +110,18 @@ async function onSwitchEnabled(enabled: boolean) {
 
     <van-cell-group inset>
       <template v-for="(day, index) in days" :key="index">
-        <van-cell center :title="weekDay(day)">
+        <van-cell
+            center
+            :title="weekDay(day)"
+            clickable
+            :to="{name: 'day', params: {day: day}}"
+        >
           <template #right-icon>
-            <van-switch v-model="daysEnabled[day]" @change="onSwitchEnabled " />
+            <van-switch
+                v-model="daysEnabled[day]"
+                @click.stop
+                @change="onSwitchDayEnabled(day, $event) "
+            />
           </template>
         </van-cell>
       </template>
