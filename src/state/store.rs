@@ -2,12 +2,10 @@ use crate::prelude::*;
 use deadpool_postgres::Pool;
 use sea_query::{Expr, Iden, PostgresQueryBuilder, Query, SimpleExpr};
 use serde_json;
-use serde_derive::{Deserialize, Serialize};
 use std::sync::Arc;
-use strum::{Display, EnumIter, IntoEnumIterator};
+use strum::{EnumIter, IntoEnumIterator};
 use tokio_postgres::Row;
 use tokio_postgres::types::FromSql;
-use postgres_types::ToSql;
 
 pub use self::{user::UserStore};
 

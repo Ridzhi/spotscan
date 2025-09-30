@@ -1,8 +1,10 @@
-use serde::Deserialize;
-use serde::de::{Deserializer, Error};
-use time::Time;
-use time::macros::format_description;
-use crate::domain::{Schedule, TimeWindow};
+use crate::prelude::*;
+
+use serde::{
+    Deserialize,
+    de::{Deserializer}
+};
+use time::{Time, macros::format_description};
 
 #[derive(Deserialize)]
 pub struct Response(pub Vec<Slot>);
@@ -109,7 +111,7 @@ where
 
     match Case::deserialize(d) {
         Ok(Case::Target(v)) => Ok(Some(v)),
-        Ok(Case::EmptyVec(v)) => Ok(None),
+        Ok(Case::EmptyVec(_)) => Ok(None),
         Err(err) => Err(err)
     }
 }

@@ -43,3 +43,4 @@ tower = { version = "0.5.2", features = ["util"] }
 tower-http = { version = "0.6.6", features = ["full"] }
 tracing-subscriber = "0.3.20"
 sea-query = { version = "0.32.6", features = ["derive", "backend-postgres", "with-time", "with-json", "with-uuid", "postgres-array", "attr", "thread-safe"] }
+reqwest = { version = "0.12.23", features = ["json"] }
