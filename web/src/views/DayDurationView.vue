@@ -11,16 +11,16 @@ const store = useIndexStore();
 const route = useRoute();
 const day = route.params.day as Weekday;
 
-const checked = ref(store.duration(undefined));
+const checked = ref(store.duration(day) || 'default');
 
 async function onChange(duration: string) {
   try {
     const res = await api.updateUserSettings({
       slots: {
-          [day]: {
-            duration,
-            ...store.user.settings.slots[day],
-          }
+        [day]: {
+          ...store.user.settings.slots[day],
+          duration: `${duration}.0`,
+        }
       },
     });
 
@@ -34,17 +34,27 @@ async function onChange(duration: string) {
 <template>
   <AppPage>
     <template #title>
-      {{weekDay(day)}}
+      {{ weekDay(day) }}
     </template>
     <van-radio-group v-model="checked" @change="onChange">
       <van-cell-group inset title="Длина окна">
+        <van-cell
+            title="По умолчанию"
+            clickable
+            @click="checked = 'default'"
+        >
+          <template #right-icon>
+            <van-radio name="default"/>
+          </template>
+        </van-cell>
+
         <van-cell
             title="Пол часа"
             clickable
             @click="checked = '1800'"
         >
           <template #right-icon>
-            <van-radio name="1800" />
+            <van-radio name="1800"/>
           </template>
         </van-cell>
 
@@ -54,7 +64,7 @@ async function onChange(duration: string) {
             @click="checked = '3600'"
         >
           <template #right-icon>
-            <van-radio name="3600" />
+            <van-radio name="3600"/>
           </template>
         </van-cell>
 
@@ -64,7 +74,7 @@ async function onChange(duration: string) {
             @click="checked = '5400'"
         >
           <template #right-icon>
-            <van-radio name="5400" />
+            <van-radio name="5400"/>
           </template>
         </van-cell>
 
@@ -74,7 +84,7 @@ async function onChange(duration: string) {
             @click="checked = '7200'"
         >
           <template #right-icon>
-            <van-radio name="7200" />
+            <van-radio name="7200"/>
           </template>
         </van-cell>
 
@@ -84,7 +94,7 @@ async function onChange(duration: string) {
             @click="checked = '9000'"
         >
           <template #right-icon>
-            <van-radio name="9000" />
+            <van-radio name="9000"/>
           </template>
         </van-cell>
 
@@ -94,7 +104,7 @@ async function onChange(duration: string) {
             @click="checked = '10800'"
         >
           <template #right-icon>
-            <van-radio name="10800" />
+            <van-radio name="10800"/>
           </template>
         </van-cell>
       </van-cell-group>

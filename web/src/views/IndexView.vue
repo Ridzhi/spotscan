@@ -51,6 +51,7 @@ async function onSwitchDayEnabled(day: Weekday, enabled: boolean) {
     const res = await api.updateUserSettings({
       slots: {
         [day]: {
+          ...store.user.settings.slots[day],
           enabled
         }
       }
