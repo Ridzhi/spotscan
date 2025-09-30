@@ -6,7 +6,6 @@ import {showNotify} from "vant";
 import {api} from "@/utils/api";
 import MainGap from "@/components/MainGap.vue";
 import {type Weekday, weekDay} from "@/utils/helpers";
-import type {WindowSettings} from "@/utils/openapi";
 
 const store = useIndexStore();
 

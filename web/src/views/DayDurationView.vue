@@ -15,11 +15,13 @@ const checked = ref(store.duration(day) || 'default');
 
 async function onChange(duration: string) {
   try {
+    const v = duration === 'default' ? null : `${duration}.0`;
+
     const res = await api.updateUserSettings({
       slots: {
         [day]: {
           ...store.user.settings.slots[day],
-          duration: `${duration}.0`,
+          duration: v,
         }
       },
     });

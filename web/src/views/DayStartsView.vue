@@ -13,17 +13,22 @@ const route = useRoute();
 
 const day = route.params.day as Weekday;
 
-const times = timesRange(9, 23.5).map(v => ({text: v, value: v}));
+const times = [
+  {text: 'По умолчанию', value: ''},
+  ...timesRange(9, 23.5).map(v => ({text: v, value: v})),
+];
 
-const value = ref([store.starts(day)!]);
+const value = ref([store.starts(day) || '']);
 
 async function onConfirm({selectedValues}: PickerConfirmEventParams) {
   try {
+    const v = selectedValues[0] ? `${selectedValues[0]}:00.00` : null;
+
     const res = await api.updateUserSettings({
       slots: {
         [day]: {
-          starts: `${selectedValues[0]}:00.00`,
           ...store.user.settings.slots[day],
+          starts: v as unknown as string,
         }
       },
     });
@@ -44,7 +49,7 @@ function onCancel() {
 <template>
   <AppPage>
     <template #title>
-      {{weekDay(day)}}
+      {{ weekDay(day) }}
     </template>
     <van-picker
         v-model="value"
