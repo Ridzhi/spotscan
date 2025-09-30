@@ -75,13 +75,19 @@ async fn handler(state: Arc<AppState>,client: &reqwest::Client, date: OffsetDate
         .into();
 
     for user in users {
+        let mut matched = vec![];
+
         for (playground_number, windows) in &schedule {
             for window in windows {
                 if user.match_window(date.weekday(), window) {
-                    warn!("надо слать {} #{} time: {:?}", date.weekday(), playground_number, window);
+                    matched.push((playground_number, window));
+
+                    // warn!("надо слать {} #{} time: {:?}", date.weekday(), playground_number, window);
                 }
             }
         }
+
+
     }
 
     Ok(())
