@@ -2,12 +2,11 @@
 import AppPage from "@/components/AppPage.vue";
 import {ref} from "vue";
 import {api} from "@/utils/api";
-import type {AppTheme} from "@/utils/openapi";
 import {showNotify} from "vant";
 import {useIndexStore} from "@/stores";
 
 const store = useIndexStore();
-const checked = ref(store.defaultDuration);
+const checked = ref(store.duration(undefined));
 
 async function onChange(v: string) {
   try {

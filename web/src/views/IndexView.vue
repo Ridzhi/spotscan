@@ -85,7 +85,7 @@ async function onSwitchDayEnabled(day: Weekday, enabled: boolean) {
           clickable
           center
           is-link
-          :value="store.defaultDurationHuman"
+          :value="store.durationHuman(undefined)"
           :to="{name: 'defaults-duration'}"
       />
       <van-cell
@@ -93,7 +93,7 @@ async function onSwitchDayEnabled(day: Weekday, enabled: boolean) {
           clickable
           center
           is-link
-          :value="store.defaultStarts"
+          :value="store.starts(undefined)!"
           :to="{name: 'defaults-starts'}"
       />
       <van-cell
@@ -101,7 +101,7 @@ async function onSwitchDayEnabled(day: Weekday, enabled: boolean) {
           clickable
           center
           is-link
-          :value="store.defaultEnds"
+          :value="store.ends(undefined)!"
           :to="{name: 'defaults-ends'}"
       />
     </van-cell-group>

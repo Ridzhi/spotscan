@@ -4,6 +4,7 @@ import {computed, ref} from "vue";
 import type {User} from "@/utils/openapi";
 import type {ConfigProviderTheme} from "vant";
 import {AppTheme} from "@/utils/openapi";
+import type {Weekday} from "@/utils/helpers";
 
 export const useIndexStore = defineStore('index', () => {
     let loaded = false;
@@ -47,16 +48,40 @@ export const useIndexStore = defineStore('index', () => {
         loaded = true;
     }
 
-    const defaultDuration = computed(() => {
-        return '' + parseInt(user.value.settings.defaults.duration);
+    const duration = computed(() => {
+        return (day: Weekday | undefined) => {
+            const v = day ? user.value.settings.slots[day].duration : user.value.settings.defaults.duration;
+
+            if (v) {
+                return parseInt(v).toString();
+            }
+
+            return null;
+        }
     });
 
-    const defaultStarts = computed(() => {
-        return user.value.settings.defaults.starts.slice(0, -5);
+    const starts  = computed(() => {
+        return (day: Weekday | undefined) => {
+            const v = day ? user.value.settings.slots[day].starts : user.value.settings.defaults.starts;
+
+            if (v) {
+                return v.slice(0, -5);
+            }
+
+            return null;
+        }
     });
 
-    const defaultEnds = computed(() => {
-        return user.value.settings.defaults.ends.slice(0, -5);
+    const ends  = computed(() => {
+        return (day: Weekday | undefined) => {
+            const v = day ? user.value.settings.slots[day].ends : user.value.settings.defaults.ends;
+
+            if (v) {
+                return v.slice(0, -5);
+            }
+
+            return null;
+        }
     });
 
     const vanTheme = computed<ConfigProviderTheme>(() => {
@@ -92,27 +117,35 @@ export const useIndexStore = defineStore('index', () => {
         return lookup[user.value.settings.app_theme];
     })
 
-    const defaultDurationHuman = computed(() => {
-        const lookup = {
-            '1800': 'Пол часа',
-            '3600': 'Час',
-            '5400': 'Полтора часа',
-            '7200': 'Два часа',
-            '9000': 'Два с половиной часа',
-            '10800': 'Три часа',
-        };
+    const durationHuman = computed((): (day: Weekday | undefined) => string => {
+        return (day: Weekday | undefined): string => {
+            const lookup = {
+                '1800': 'Пол часа',
+                '3600': 'Час',
+                '5400': 'Полтора часа',
+                '7200': 'Два часа',
+                '9000': 'Два с половиной часа',
+                '10800': 'Три часа',
+            };
 
-        return lookup[defaultDuration.value as keyof typeof lookup] || 'Непонятно';
-    })
+            const v = duration.value(day);
+
+            if (v) {
+                return lookup[v as keyof typeof lookup] || 'Непонятно';
+            }
+
+            return 'По умолчанию';
+        }
+    });
 
     return {
         user,
-        defaultDuration,
-        defaultStarts,
-        defaultEnds,
+        duration,
+        starts,
+        ends,
         vanTheme,
         themeHuman,
-        defaultDurationHuman,
+        durationHuman,
         load,
     }
 });

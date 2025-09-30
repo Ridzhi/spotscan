@@ -10,7 +10,7 @@ const store = useIndexStore();
 const router = useRouter();
 const times = timesRange(9, 23.5).map(v => ({text: v, value: v}));
 
-const value = ref([store.defaultEnds]);
+const value = ref([store.ends(undefined)]);
 
 async function onConfirm({selectedValues}: PickerConfirmEventParams) {
   try {
