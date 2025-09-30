@@ -53,12 +53,12 @@ pub struct User {
 
 impl User {
     pub fn match_window(&self, d: Weekday, w: &TimeWindow) -> bool {
-        self.settings.get_starts(d).ge(&w.start)
-            && self.settings.get_ends(d).le(&w.end)
-            && self
-                .settings
-                .get_duration(d)
-                .le(&w.end.duration_until(w.start))
+        self.settings.get_starts(d).le(&w.start)
+        && self.settings.get_ends(d).ge(&w.end)
+        && self
+            .settings
+            .get_duration(d)
+            .le(&w.start.duration_until(w.end))
     }
 }
 

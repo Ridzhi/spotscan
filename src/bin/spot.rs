@@ -7,9 +7,14 @@ use time::{
     macros::{format_description, offset},
 };
 use tokio;
+use log::{error, info, warn};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    env_logger::init();
+
+    info!("SPOT started!");
+
     let state = Arc::new(AppState::default());
     let client = reqwest::Client::new();
 
@@ -53,6 +58,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 
 async fn handler(state: Arc<AppState>,client: &reqwest::Client, date: OffsetDateTime) -> Result<()> {
+    info!("Handle {}", date.weekday());
+
     let users = state.user_store().find_many(vec![UserOption::Enabled(date.weekday())]).await?;
 
     if users.is_empty() {
@@ -71,7 +78,7 @@ async fn handler(state: Arc<AppState>,client: &reqwest::Client, date: OffsetDate
         for (playground_number, windows) in &schedule {
             for window in windows {
                 if user.match_window(date.weekday(), window) {
-                    println!("надо слать {} #{} time: {:?}", date.weekday(), playground_number, window);
+                    warn!("надо слать {} #{} time: {:?}", date.weekday(), playground_number, window);
                 }
             }
         }
