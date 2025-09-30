@@ -1,17 +1,27 @@
 <script setup lang="ts">
+import {useIndexStore} from "@/stores";
+import {useRoute} from "vue-router";
+import {weekDay, type Weekday} from "@/utils/helpers";
 import AppPage from "@/components/AppPage.vue";
 import {ref} from "vue";
 import {api} from "@/utils/api";
 import {showNotify} from "vant";
-import {useIndexStore} from "@/stores";
 
 const store = useIndexStore();
+const route = useRoute();
+const day = route.params.day as Weekday;
+
 const checked = ref(store.duration(undefined));
 
-async function onChange(v: string) {
+async function onChange(duration: string) {
   try {
     const res = await api.updateUserSettings({
-      window_default_duration: `${v}.0`
+      slots: {
+          [day]: {
+            duration,
+            ...store.user.settings.slots[day],
+          }
+      },
     });
 
     store.user = res.data.data;
@@ -23,8 +33,11 @@ async function onChange(v: string) {
 
 <template>
   <AppPage>
+    <template #title>
+      {{weekDay(day)}}
+    </template>
     <van-radio-group v-model="checked" @change="onChange">
-      <van-cell-group inset title="Длина окна по умолчанию(если не указано)">
+      <van-cell-group inset title="Длина окна">
         <van-cell
             title="Пол часа"
             clickable
@@ -88,4 +101,3 @@ async function onChange(v: string) {
     </van-radio-group>
   </AppPage>
 </template>
-

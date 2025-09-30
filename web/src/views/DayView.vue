@@ -22,7 +22,7 @@ const day = route.params.day as Weekday;
           center
           is-link
           :value="store.durationHuman(day)"
-          :to="{name: 'defaults-duration'}"
+          :to="{name: 'day-duration', params: {day: day}}"
       />
       <van-cell
           title="Время, от"
@@ -30,7 +30,7 @@ const day = route.params.day as Weekday;
           center
           is-link
           :value="store.starts(day) || 'По умолчанию'"
-          :to="{name: 'defaults-starts'}"
+          :to="{name: 'day-starts', params: {day: day}}"
       />
       <van-cell
           title="Время, до"
@@ -38,7 +38,7 @@ const day = route.params.day as Weekday;
           center
           is-link
           :value="store.ends(day) || 'По умолчанию'"
-          :to="{name: 'defaults-ends'}"
+          :to="{name: 'day-ends', params: {day: day}}"
       />
     </van-cell-group>
   </AppPage>
