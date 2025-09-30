@@ -1,6 +1,6 @@
 #!make
 ENV_FILE = .env
-DC_CLI = docker compose --env-file=$(ENV_FILE) --profile dev
+DC_CLI = docker compose --env-file=$(ENV_FILE) --profile $(ENV)
 #
 ## to share env here
 include $(ENV_FILE)
