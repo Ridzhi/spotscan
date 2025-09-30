@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use reqwest;
 use spotscan::{prelude::*, spot};
 use std::ops::Add;
@@ -32,27 +33,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         tokio::time::sleep(tokio::time::Duration::from_secs(60)).await;
     }
-
-    // берем каждую дату
-    // делаем запрос
-    // обрабатываем данные
-    // спим 5 сек
-
-    // спим минут после пачки дат
-
-    // println!("Spot: {:?}", dates);
-
-    // let client = reqwest::Client::new();
-    // let schedule: Schedule = client.get("https://atlanticspot.ru/api/booking/times.php")
-    //     .query(&[("bookingDate", "30.09.2025")])
-    //     .send()
-    //     .await?
-    //     .json::<spot::Response>()
-    //     .await?
-    //     .into();
-    //
-    // println!("{schedule:#?}");
-    Ok(())
 }
 
 
@@ -73,6 +53,13 @@ async fn handler(state: Arc<AppState>, bot: &TgClient, client: &reqwest::Client,
         .await?
         .into();
 
+    let mut schedule = schedule.into_iter().map(|(k, v)| {
+        (k, v)
+    })
+        .collect::<Vec<(u8, Vec<TimeWindow>)>>();
+
+    schedule.sort_by(|a, b| a.0.cmp(&b.0));
+
     for user in users {
         let mut matches = vec![];
 
@@ -84,20 +71,29 @@ async fn handler(state: Arc<AppState>, bot: &TgClient, client: &reqwest::Client,
             }
         }
 
-        let msg = matches.into_iter()
+        let body = matches.into_iter()
             .map(|(n, window)| {
-                create_message(&date, *n, window)
+                create_message(*n, window)
             })
             .collect::<Vec<String>>()
             .join("\n");
 
-        bot.send_message(user, InputMessage::new().text(msg)).await?;
+        bot.send_message(user, InputMessage::new().text(format!("{}\n{}", get_message_date(&date), body))).await?;
     }
 
     Ok(())
 }
 
-fn create_message(date: &OffsetDateTime, playground_number: u8, w: &TimeWindow) -> String {
+fn create_message(playground_number: u8, w: &TimeWindow) -> String {
+    format!(
+        "#{} {}-{}",
+        playground_number,
+        w.start.format(format_description!("[hour]:[minute]")).unwrap(),
+        w.end.format(format_description!("[hour]:[minute]")).unwrap(),
+    )
+}
+
+fn get_message_date(date: &OffsetDateTime) -> String {
     let weekday = match date.weekday() {
         Weekday::Monday => "Пн",
         Weekday::Tuesday => "Вт",
@@ -108,12 +104,5 @@ fn create_message(date: &OffsetDateTime, playground_number: u8, w: &TimeWindow) 
         Weekday::Sunday => "Вск"
     };
 
-    format!(
-        "{},{}: #{} {}-{}",
-        weekday,
-        date.day(),
-        playground_number,
-        w.start.format(format_description!("[hour]:[minute]")).unwrap(),
-        w.end.format(format_description!("[hour]:[minute]")).unwrap(),
-    )
+    format!("{},{}", weekday, date.day())
 }
