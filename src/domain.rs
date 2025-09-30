@@ -2,6 +2,8 @@ use serde_derive::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::ops::Deref;
+use grammers_client::session::PackedType;
+use grammers_client::types::PackedChat;
 use time::PrimitiveDateTime;
 use time::macros::time;
 use time::{Duration, Time, Weekday};
@@ -70,6 +72,16 @@ impl User {
             tg_user_access_hash,
             settings: Settings::default(),
             created_at: Default::default(),
+        }
+    }
+}
+
+impl Into<PackedChat> for User {
+    fn into(self) -> PackedChat {
+        PackedChat {
+            ty: PackedType::User,
+            id: self.tg_user_id,
+            access_hash: self.tg_user_access_hash.into(),
         }
     }
 }

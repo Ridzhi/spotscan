@@ -25,7 +25,6 @@ fn main() -> Result<()> {
 
 async fn handle_update(client: Client, state: Arc<AppState>, update: Update) -> Result<()> {
     let c = state.config();
-
     match update {
         Update::NewMessage(message) if !message.outgoing() && message.text().len() > 0 => {
             let is_new_message = if let tl::enums::Update::NewMessage(nm) = &message.raw {
