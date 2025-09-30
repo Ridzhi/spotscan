@@ -108,7 +108,7 @@ async function onSwitchDayEnabled(day: Weekday, enabled: boolean) {
 
     <MainGap />
 
-    <van-cell-group inset>
+    <van-cell-group inset title="Фильтры по дням">
       <template v-for="(day, index) in days" :key="index">
         <van-cell
             center
