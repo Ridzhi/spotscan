@@ -29,6 +29,6 @@ cargo-build:
 	cargo build --bin api --release
 	cargo build --bin bot --release
 	cargo build --bin spot --release
-	cp /root/app/spotscan/target/release/build/api /usr/local/bin/spotscan-api
-	cp /root/app/spotscan/target/release/build/bot /usr/local/bin/spotscan-bot
-	cp /root/app/spotscan/target/release/build/spot /usr/local/bin/spotscan-spot
+	cp /root/app/spotscan/target/release/api /usr/local/bin/spotscan-api
+	cp /root/app/spotscan/target/release/bot /usr/local/bin/spotscan-bot
+	cp /root/app/spotscan/target/release/spot /usr/local/bin/spotscan-spot
