@@ -24,3 +24,8 @@ migrate:
 
 api:
 	openapi-generator generate -i docs/openapi.json -g typescript-axios -o web/src/utils/openapi
+
+cargo-build:
+	cargo build --bin api --release
+	cargo build --bin bot --release
+	cargo build --bin spot --release

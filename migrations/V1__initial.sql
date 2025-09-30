@@ -6,3 +6,7 @@ CREATE TABLE "user"
     settings jsonb NOT NULL,
     created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL
 );
+
+CREATE UNIQUE INDEX user_id_idx ON "user" (id);
+CREATE INDEX user_tg_user_id_id ON "user" (tg_user_id);
+CREATE INDEX user_settings ON "user" USING gin (settings);
