@@ -18,7 +18,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let state = Arc::new(AppState::default());
     let bot = factory_bot_client(state.clone()).await;
-    let client = reqwest::Client::new();
 
     loop {
         let spb_time = OffsetDateTime::now_utc().to_offset(offset!(+3:00));
@@ -29,7 +28,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .collect::<Vec<_>>();
 
         for date in dates {
-            match handler(state.clone(), &bot, &client, date).await {
+            match handler(state.clone(), &bot, date).await {
                 Ok(_) => {}
                 Err(err) => {
                     error!("handler error: {}", err);
@@ -45,7 +44,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 async fn handler(
     state: Arc<AppState>,
     bot: &TgClient,
-    client: &reqwest::Client,
     date: OffsetDateTime,
 ) -> Result<()> {
     let users = state
