@@ -56,12 +56,14 @@ pub struct User {
 
 impl User {
     pub fn match_window(&self, d: Weekday, w: &TimeWindow) -> bool {
-        self.settings.get_starts(d).le(&w.start)
-        && self.settings.get_ends(d).ge(&w.end)
-        && self
-            .settings
-            .get_duration(d)
-            .le(&w.start.duration_until(w.end.0))
+        let from = std::cmp::max(self.settings.get_starts(d).0, w.start.0);
+        let to = std::cmp::min(self.settings.get_ends(d).0, w.end.0);
+
+        if from >= to {
+            return false;
+        }
+
+        self.settings.get_duration(d).le(&from.duration_until(to))
     }
 }
 
