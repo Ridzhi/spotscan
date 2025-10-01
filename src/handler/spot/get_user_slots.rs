@@ -1,4 +1,3 @@
-use time::OffsetDateTime;
 use super::*;
 
 #[utoipa::path(
@@ -28,46 +27,3 @@ pub async fn handler(
 pub struct Res {
     pub data: FreeSlotsWeek,
 }
-
-// #[derive(Serialize, ToSchema)]
-// pub struct ResSlots(pub Vec<ResDaySlot>);
-//
-// #[derive(Serialize, ToSchema)]
-// pub struct ResDaySlot{
-//     pub date: String,
-//     pub windows: Vec<ResWindow>
-// }
-// #[derive(Serialize, ToSchema)]
-// pub struct ResWindow{
-//     pub field: FieldNumber,
-//     pub window: TimeWindow
-// }
-// impl Into<ResSlots> for FreeSlots {
-//     fn into(self) -> ResSlots {
-//         ResSlots(self.0.into_iter()
-//             .map(|d| {
-//                 let mut windows: Vec<ResWindow> = d.slots.0.into_iter()
-//                     .map(|item| {
-//                         item.windows.iter()
-//                             .map(|tw| {
-//                                 ResWindow{
-//                                     field: item.field,
-//                                     window: tw.clone(),
-//                                 }
-//                             })
-//                             .collect::<Vec<ResWindow>>()
-//                     })
-//                     .flatten()
-//                     .collect();
-//
-//                 windows.sort_by(|a, b| a.window.start.cmp(&b.window.start));
-//
-//                 ResDaySlot {
-//                     date: get_human_day(&d.date),
-//                     windows
-//                 }
-//             })
-//             .collect()
-//         )
-//     }
-// }

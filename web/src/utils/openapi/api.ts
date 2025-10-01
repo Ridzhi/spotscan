@@ -41,15 +41,53 @@ export type AppTheme = typeof AppTheme[keyof typeof AppTheme];
 /**
  * 
  * @export
+ * @interface FreeSlot
+ */
+export interface FreeSlot {
+    /**
+     * 
+     * @type {number}
+     * @memberof FreeSlot
+     */
+    'field': number;
+    /**
+     * 
+     * @type {TimeWindow}
+     * @memberof FreeSlot
+     */
+    'window': TimeWindow;
+}
+/**
+ * 
+ * @export
+ * @interface FreeSlotWeek
+ */
+export interface FreeSlotWeek {
+    /**
+     * 
+     * @type {string}
+     * @memberof FreeSlotWeek
+     */
+    'date': string;
+    /**
+     * 
+     * @type {Array<FreeSlot>}
+     * @memberof FreeSlotWeek
+     */
+    'slots': Array<FreeSlot>;
+}
+/**
+ * 
+ * @export
  * @interface GetUserSlots
  */
 export interface GetUserSlots {
     /**
      * 
-     * @type {Array<ResDaySlot>}
+     * @type {Array<FreeSlotWeek>}
      * @memberof GetUserSlots
      */
-    'data': Array<ResDaySlot>;
+    'data': Array<FreeSlotWeek>;
 }
 /**
  * 
@@ -63,44 +101,6 @@ export interface Res {
      * @memberof Res
      */
     'data': User;
-}
-/**
- * 
- * @export
- * @interface ResDaySlot
- */
-export interface ResDaySlot {
-    /**
-     * 
-     * @type {string}
-     * @memberof ResDaySlot
-     */
-    'date': string;
-    /**
-     * 
-     * @type {Array<ResWindow>}
-     * @memberof ResDaySlot
-     */
-    'windows': Array<ResWindow>;
-}
-/**
- * 
- * @export
- * @interface ResWindow
- */
-export interface ResWindow {
-    /**
-     * 
-     * @type {number}
-     * @memberof ResWindow
-     */
-    'field': number;
-    /**
-     * 
-     * @type {TimeWindow}
-     * @memberof ResWindow
-     */
-    'window': TimeWindow;
 }
 /**
  * 
