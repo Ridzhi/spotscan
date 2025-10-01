@@ -206,13 +206,25 @@ pub fn now_utc() -> PrimitiveDateTime {
 }
 
 #[derive(Serialize, Deserialize, Default, Debug, ToSchema)]
-pub struct FreeSlotsDay(pub Vec<(FieldNumber, Vec<TimeWindow>)>);
+pub struct FreeSlotsDay(pub Vec<FieldSlot>);
+
+#[derive(Serialize, Deserialize, Default, Debug, ToSchema)]
+pub struct FieldSlot {
+    pub field: FieldNumber,
+    pub windows: Vec<TimeWindow>,
+}
 
 #[derive(Serialize, Deserialize, Default, Debug ,ToSchema)]
-pub struct FreeSlots(pub Vec<(OffsetDateTime, FreeSlotsDay)>);
+pub struct FreeSlots(pub Vec<DaySlot>);
+
+#[derive(Serialize, Deserialize, Debug ,ToSchema)]
+pub struct DaySlot {
+    pub date: OffsetDateTime,
+    pub slots: FreeSlotsDay,
+}
 
 impl Deref for FreeSlotsDay {
-    type Target = Vec<(FieldNumber, Vec<TimeWindow>)>;
+    type Target = Vec<FieldSlot>;
     fn deref(&self) -> &Self::Target {
         &self.0
     }
@@ -315,4 +327,18 @@ pub enum AppTheme {
     #[postgres(name = "SYSTEM")]
     #[strum(to_string = "SYSTEM")]
     System,
+}
+
+pub fn get_human_day(date: &OffsetDateTime) -> String {
+    let weekday = match date.weekday() {
+        Weekday::Monday => "Пн",
+        Weekday::Tuesday => "Вт",
+        Weekday::Wednesday => "Ср",
+        Weekday::Thursday => "Чт",
+        Weekday::Friday => "Пт",
+        Weekday::Saturday => "Сб",
+        Weekday::Sunday => "Вск"
+    };
+
+    format!("{},{}", weekday, date.day())
 }

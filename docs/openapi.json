@@ -82,51 +82,6 @@
           "System"
         ]
       },
-      "FreeSlots": {
-        "type": "array",
-        "items": {
-          "type": "array",
-          "items": false,
-          "prefixItems": [
-            {
-              "type": "string",
-              "format": "date-time"
-            },
-            {
-              "type": "array",
-              "items": {
-                "type": "array",
-                "items": false,
-                "prefixItems": [
-                  {
-                    "type": "integer",
-                    "format": "int32",
-                    "minimum": 0
-                  },
-                  {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "required": [
-                        "start",
-                        "end"
-                      ],
-                      "properties": {
-                        "end": {
-                          "$ref": "#/components/schemas/Time"
-                        },
-                        "start": {
-                          "$ref": "#/components/schemas/Time"
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      },
       "GetUserSlots": {
         "type": "object",
         "required": [
@@ -134,7 +89,7 @@
         ],
         "properties": {
           "data": {
-            "$ref": "#/components/schemas/FreeSlots"
+            "$ref": "#/components/schemas/ResSlots"
           }
         }
       },
@@ -146,6 +101,45 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "ResDaySlot": {
+        "type": "object",
+        "required": [
+          "date",
+          "windows"
+        ],
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "windows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResWindow"
+            }
+          }
+        }
+      },
+      "ResSlots": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ResDaySlot"
+        }
+      },
+      "ResWindow": {
+        "type": "object",
+        "required": [
+          "field",
+          "window"
+        ],
+        "properties": {
+          "field": {
+            "$ref": "#/components/schemas/u8"
+          },
+          "window": {
+            "$ref": "#/components/schemas/TimeWindow"
           }
         }
       },
@@ -182,6 +176,21 @@
       "Time": {
         "type": "string",
         "format": "[hour]:[minute]"
+      },
+      "TimeWindow": {
+        "type": "object",
+        "required": [
+          "start",
+          "end"
+        ],
+        "properties": {
+          "end": {
+            "$ref": "#/components/schemas/Time"
+          },
+          "start": {
+            "$ref": "#/components/schemas/Time"
+          }
+        }
       },
       "UpdateUserSettingsRequest": {
         "type": "object",
@@ -334,6 +343,11 @@
       "i64": {
         "type": "integer",
         "format": "int64"
+      },
+      "u8": {
+        "type": "integer",
+        "format": "int32",
+        "minimum": 0
       }
     }
   }

@@ -4,6 +4,7 @@ use serde::{Deserialize, de::Deserializer};
 use std::collections::HashMap;
 use std::sync::Arc;
 use time::{OffsetDateTime, Time, macros::format_description};
+use tokio_postgres::fallible_iterator::FallibleIterator;
 
 static URL: &str = "https://atlanticspot.ru/api/booking/times.php";
 
@@ -57,7 +58,13 @@ impl Into<FreeSlotsDay> for Response {
 
         FreeSlotsDay(
             s.into_iter()
-                .collect::<Vec<(FieldNumber, Vec<TimeWindow>)>>(),
+                .map(|item| {
+                    FieldSlot{
+                        field: item.0,
+                        windows: item.1,
+                    }
+                })
+                .collect(),
         )
     }
 }
@@ -141,8 +148,27 @@ pub async fn get_user_free_slots(state: Arc<AppState>, user: &User) -> Result<Fr
             "Getting user({}) free slots: date={:?}",
             user.tg_user_id, date
         );
-        let free_slots = get_free_slots(state.clone(), &date).await?;
-        result.0.push((date, free_slots));
+        
+        let user_free_slots = get_free_slots(state.clone(), &date)
+            .await?
+            .0
+            .into_iter()
+            .map(|slot| {
+                FieldSlot {
+                    field: slot.field,
+                    windows: slot.windows.into_iter()
+                        .filter(|w| {
+                            user.match_window(date.weekday(), w)
+                        })
+                        .collect(),
+                }
+            })
+            .collect::<Vec<FieldSlot>>();
+
+        result.0.push(DaySlot{
+            date,
+            slots: FreeSlotsDay(user_free_slots)
+        });
     }
 
     Ok(result)
@@ -163,7 +189,7 @@ pub async fn get_free_slots(state: Arc<AppState>, date: &OffsetDateTime) -> Resu
         .await?
         .into();
 
-    s.sort_by(|a, b| a.0.cmp(&b.0));
+    s.sort_by(|a, b| a.field.cmp(&b.field));
 
     Ok(s)
 }

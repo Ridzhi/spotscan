@@ -46,10 +46,10 @@ export type AppTheme = typeof AppTheme[keyof typeof AppTheme];
 export interface GetUserSlots {
     /**
      * 
-     * @type {Array<Array<any>>}
+     * @type {Array<ResDaySlot>}
      * @memberof GetUserSlots
      */
-    'data': Array<Array<any>>;
+    'data': Array<ResDaySlot>;
 }
 /**
  * 
@@ -63,6 +63,44 @@ export interface Res {
      * @memberof Res
      */
     'data': User;
+}
+/**
+ * 
+ * @export
+ * @interface ResDaySlot
+ */
+export interface ResDaySlot {
+    /**
+     * 
+     * @type {string}
+     * @memberof ResDaySlot
+     */
+    'date': string;
+    /**
+     * 
+     * @type {Array<ResWindow>}
+     * @memberof ResDaySlot
+     */
+    'windows': Array<ResWindow>;
+}
+/**
+ * 
+ * @export
+ * @interface ResWindow
+ */
+export interface ResWindow {
+    /**
+     * 
+     * @type {number}
+     * @memberof ResWindow
+     */
+    'field': number;
+    /**
+     * 
+     * @type {TimeWindow}
+     * @memberof ResWindow
+     */
+    'window': TimeWindow;
 }
 /**
  * 
@@ -97,6 +135,25 @@ export interface Settings {
 }
 
 
+/**
+ * 
+ * @export
+ * @interface TimeWindow
+ */
+export interface TimeWindow {
+    /**
+     * 
+     * @type {string}
+     * @memberof TimeWindow
+     */
+    'end': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TimeWindow
+     */
+    'start': string;
+}
 /**
  * 
  * @export
