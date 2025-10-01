@@ -25,6 +25,9 @@ function formatDate(date: string) {
   <template #title>
     Свободные слоты
   </template>
+  <template #sub-title>
+    С учетом ваших фильтров
+  </template>
 
   <template v-for="(item, index) in data" :key="index">
     <van-cell-group :title="`${formatDate(item.date)}`" inset>
