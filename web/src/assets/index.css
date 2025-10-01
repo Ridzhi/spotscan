@@ -38,9 +38,6 @@
     --van-search-content-background: var(--van-background);
     --van-cell-background: var(--van-background);
 }
-/*html, #app, body {*/
-/*    height: 100%;*/
-/*}*/
 
 body {
     font-family: -apple-system, 'Inter', sans-serif;
@@ -233,4 +230,8 @@ input {
 
 .gmi-trending_down::before {
     content: 'trending_down';
+}
+
+.gmi-calendar_view_month::before {
+    content: 'calendar_view_month';
 }

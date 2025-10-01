@@ -7,6 +7,7 @@ use time::{Duration, OffsetDateTime, macros::{format_description, offset}, Weekd
 use tokio;
 use log::{error, info, warn};
 use grammers_client::{Client as TgClient, InputMessage};
+use time::macros::{date, datetime};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -45,20 +46,7 @@ async fn handler(state: Arc<AppState>, bot: &TgClient, client: &reqwest::Client,
         return Ok(());
     }
 
-    let schedule: Schedule = client.get("https://atlanticspot.ru/api/booking/times.php")
-        .query(&[("bookingDate", date.format(format_description!("[day].[month].[year]")).expect("date.format failed"))])
-        .send()
-        .await?
-        .json::<spot::Response>()
-        .await?
-        .into();
-
-    let mut schedule = schedule.into_iter().map(|(k, v)| {
-        (k, v)
-    })
-        .collect::<Vec<(u8, Vec<TimeWindow>)>>();
-
-    schedule.sort_by(|a, b| a.0.cmp(&b.0));
+    let schedule = get_schedule(bot, client, date).await?;
 
     for user in users {
         let mut matches = vec![];
@@ -105,4 +93,23 @@ fn get_message_date(date: &OffsetDateTime) -> String {
     };
 
     format!("{},{}", weekday, date.day())
+}
+
+async fn get_schedule(bot: &TgClient, client: &reqwest::Client, date: OffsetDateTime) -> Result<Vec<(u8, Vec<TimeWindow>)>> {
+    let schedule: Schedule = client.get("https://atlanticspot.ru/api/booking/times.php")
+        .query(&[("bookingDate", date.format(format_description!("[day].[month].[year]")).expect("date.format failed"))])
+        .send()
+        .await?
+        .json::<spot::Response>()
+        .await?
+        .into();
+
+    let mut schedule = schedule.into_iter().map(|(k, v)| {
+        (k, v)
+    })
+        .collect::<Vec<(u8, Vec<TimeWindow>)>>();
+
+    schedule.sort_by(|a, b| a.0.cmp(&b.0));
+
+    Ok(schedule)
 }

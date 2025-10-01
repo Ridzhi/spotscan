@@ -20,14 +20,14 @@ async function onConfirm({selectedValues}: PickerConfirmEventParams) {
 
     store.user = res.data.data;
 
-    await router.push({name: 'index'});
+    await router.push({name: 'settings'});
   } catch {
     showNotify("Что то пошло не так");
   }
 }
 
 function onCancel() {
-  router.push({name: 'index'});
+  router.push({name: 'settings'});
 }
 
 </script>

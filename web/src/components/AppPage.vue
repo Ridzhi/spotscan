@@ -28,9 +28,9 @@ function onClick() {
     <ContentWrap>
       <div class="row x-align-sb y-align-baseline">
         <div>
-          <h1 v-if="$slots.title">
+          <h2 v-if="$slots.title">
             <slot name="title" />
-          </h1>
+          </h2>
         </div>
         <div>
           <slot name="actions" />

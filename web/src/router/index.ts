@@ -7,9 +7,14 @@ export const routes = [
     component: () => import('@/views/MainLayout.vue'),
     children: [
       {
-        path: '',
-        name: 'index',
-        component: () => import('@/views/IndexView.vue'),
+        path: '/slots',
+        name: 'slots',
+        component: () => import('@/views/SlotsView.vue'),
+      },
+      {
+        path: '/settings',
+        name: 'settings',
+        component: () => import('@/views/SettingsView.vue'),
       },
       {
         path: '',
