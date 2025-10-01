@@ -70,7 +70,11 @@ async function onSwitchDayEnabled(day: Weekday, enabled: boolean) {
     </template>
 
     <van-cell-group inset>
-      <van-cell center title="Уведомления включены">
+      <van-cell
+          center
+          title="Уведомления включены"
+          label="Каждые 10 минут будет приходить сводка по свободным слотам с учетом ваших фильтров"
+      >
         <template #right-icon>
           <van-switch v-model="enabled" @change="onSwitchEnabled " />
         </template>
