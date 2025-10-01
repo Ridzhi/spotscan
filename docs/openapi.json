@@ -10,6 +10,23 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/v1/spot/slots": {
+      "get": {
+        "operationId": "get_user_slots",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetUserSlots"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/user": {
       "get": {
         "operationId": "get_user",
@@ -64,6 +81,62 @@
           "Dark",
           "System"
         ]
+      },
+      "FreeSlots": {
+        "type": "array",
+        "items": {
+          "type": "array",
+          "items": false,
+          "prefixItems": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": false,
+                "prefixItems": [
+                  {
+                    "type": "integer",
+                    "format": "int32",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "start",
+                        "end"
+                      ],
+                      "properties": {
+                        "end": {
+                          "$ref": "#/components/schemas/Time"
+                        },
+                        "start": {
+                          "$ref": "#/components/schemas/Time"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "GetUserSlots": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/FreeSlots"
+          }
+        }
       },
       "Res": {
         "type": "object",

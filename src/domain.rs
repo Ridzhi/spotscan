@@ -1,11 +1,11 @@
 use serde_derive::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::collections::HashMap;
-use std::ops::Deref;
+use std::ops::{Add, Deref, DerefMut};
 use grammers_client::session::PackedType;
 use grammers_client::types::PackedChat;
-use time::PrimitiveDateTime;
-use time::macros::time;
+use time::{OffsetDateTime, PrimitiveDateTime};
+use time::macros::{offset, time};
 use time::{Duration, Time, Weekday};
 use tokio_postgres::types::{FromSql, ToSql};
 use utoipa::openapi::{RefOr, Schema, SchemaFormat, schema};
@@ -14,6 +14,7 @@ use utoipa::{PartialSchema, ToSchema};
 pub type TgUsername = String;
 pub type TgUserId = i64;
 pub type TgAccessHash = i64;
+pub type FieldNumber = u8;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppTime(pub Time);
@@ -60,7 +61,7 @@ impl User {
         && self
             .settings
             .get_duration(d)
-            .le(&w.start.duration_until(w.end))
+            .le(&w.start.duration_until(w.end.0))
     }
 }
 
@@ -199,23 +200,73 @@ impl Into<PrimitiveDateTime> for UtcDateTime {
 }
 
 pub fn now_utc() -> PrimitiveDateTime {
-    let now = time::OffsetDateTime::now_utc();
+    let now = OffsetDateTime::now_utc();
 
     PrimitiveDateTime::new(now.date(), now.time())
 }
 
-pub type Schedule = HashMap<u8, Vec<TimeWindow>>;
-// pub struct Schedule(HashMap<String, Vec<TimeWindow>>);
-// pub struct Day(PrimitiveDateTime, Vec<Playground>);
-// pub struct Playground {
-//     pub number: u8,
-//     pub time_windows: Vec<TimeWindow>
-// }
+#[derive(Serialize, Deserialize, Default, Debug, ToSchema)]
+pub struct FreeSlotsDay(pub Vec<(FieldNumber, Vec<TimeWindow>)>);
 
-#[derive(Clone, Debug)]
+#[derive(Serialize, Deserialize, Default, Debug ,ToSchema)]
+pub struct FreeSlots(pub Vec<(OffsetDateTime, FreeSlotsDay)>);
+
+impl Deref for FreeSlotsDay {
+    type Target = Vec<(FieldNumber, Vec<TimeWindow>)>;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for FreeSlotsDay {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+pub type Schedule = HashMap<FieldNumber, Vec<TimeWindow>>;
+
+pub struct DateIter {
+    now: OffsetDateTime,
+    start: i64,
+    end: i64,
+}
+
+impl DateIter {
+    pub fn new() -> Self {
+        // lookup one week ahead
+        Self{
+            now: OffsetDateTime::now_utc().to_offset(offset!(+3:00)),
+            start: 0,
+            end: 8,
+        }
+    }
+}
+
+impl Default for DateIter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Iterator for DateIter {
+    type Item = OffsetDateTime;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.start >= self.end {
+            return None;
+        }
+
+        let result = self.now.add(Duration::days(self.start));
+        self.start += 1;
+        Some(result)
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, ToSchema)]
 pub struct TimeWindow {
-    pub start: Time,
-    pub end: Time,
+    pub start: AppTime,
+    pub end: AppTime,
 }
 
 impl PartialSchema for AppTime {

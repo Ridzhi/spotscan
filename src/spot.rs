@@ -1,21 +1,23 @@
 use crate::prelude::*;
+use log::info;
+use serde::{Deserialize, de::Deserializer};
+use std::collections::HashMap;
+use std::sync::Arc;
+use time::{OffsetDateTime, Time, macros::format_description};
 
-use serde::{
-    Deserialize,
-    de::{Deserializer}
-};
-use time::{Time, macros::format_description};
+static URL: &str = "https://atlanticspot.ru/api/booking/times.php";
 
 #[derive(Deserialize)]
 pub struct Response(pub Vec<Slot>);
 
-impl Into<Schedule> for Response {
-    fn into(self) -> Schedule {
-        let mut s: Schedule = Default::default();
+impl Into<FreeSlotsDay> for Response {
+    fn into(self) -> FreeSlotsDay {
+        let mut s: HashMap<FieldNumber, Vec<TimeWindow>> = Default::default();
 
-        self.0.into_iter()
-            .map(|item | {
-                let mut slots:Vec<(u8, TimeWindow)> = vec![];
+        self.0
+            .into_iter()
+            .map(|item| {
+                let mut slots: Vec<(u8, TimeWindow)> = vec![];
                 let tw: TimeWindow = item.times.into();
 
                 if item.plgr_1.free {
@@ -44,7 +46,7 @@ impl Into<Schedule> for Response {
             .for_each(|item| {
                 let entry = s.entry(item.0).or_default();
 
-                if let Some(v) =entry.last_mut() {
+                if let Some(v) = entry.last_mut() {
                     if item.1.start.eq(&v.end) {
                         v.end = item.1.end;
                         return;
@@ -53,7 +55,10 @@ impl Into<Schedule> for Response {
                 entry.push(item.1);
             });
 
-        s
+        FreeSlotsDay(
+            s.into_iter()
+                .collect::<Vec<(FieldNumber, Vec<TimeWindow>)>>(),
+        )
     }
 }
 
@@ -92,15 +97,19 @@ impl Into<TimeWindow> for SlotTime {
         let format = format_description!("[hour]:[minute]");
 
         TimeWindow {
-            start: Time::parse(segments.get(0).expect("cant get timeslot.from"), &format).expect("cant parse timeslot.from"),
-            end: Time::parse(segments.get(1).expect("cant get timeslot.to"), &format).expect("cant parse timeslot.to"),
+            start: Time::parse(segments.get(0).expect("cant get timeslot.from"), &format)
+                .expect("cant parse timeslot.from")
+                .into(),
+            end: Time::parse(segments.get(1).expect("cant get timeslot.to"), &format)
+                .expect("cant parse timeslot.to")
+                .into(),
         }
     }
 }
 
 fn deserialize_group<'de, D>(d: D) -> Result<Option<PlgrGroup>, D::Error>
 where
-    D: Deserializer<'de>
+    D: Deserializer<'de>,
 {
     #[derive(Deserialize)]
     #[serde(untagged)]
@@ -112,8 +121,51 @@ where
     match Case::deserialize(d) {
         Ok(Case::Target(v)) => Ok(Some(v)),
         Ok(Case::EmptyVec(_)) => Ok(None),
-        Err(err) => Err(err)
+        Err(err) => Err(err),
     }
+}
+
+pub async fn get_user_free_slots(state: Arc<AppState>, user: &User) -> Result<FreeSlots> {
+    let dates = DateIter::new().into_iter().filter(|d| {
+        user.settings
+            .slots
+            .get(&d.weekday().into())
+            .unwrap()
+            .enabled
+    });
+
+    let mut result: FreeSlots = Default::default();
+
+    for date in dates {
+        info!(
+            "Getting user({}) free slots: date={:?}",
+            user.tg_user_id, date
+        );
+        let free_slots = get_free_slots(state.clone(), &date).await?;
+        result.0.push((date, free_slots));
+    }
+
+    Ok(result)
+}
+
+pub async fn get_free_slots(state: Arc<AppState>, date: &OffsetDateTime) -> Result<FreeSlotsDay> {
+    let mut s: FreeSlotsDay = state
+        .http_client()
+        .get(URL)
+        .query(&[(
+            "bookingDate",
+            date.format(format_description!("[day].[month].[year]"))
+                .expect("date.format failed"),
+        )])
+        .send()
+        .await?
+        .json::<Response>()
+        .await?
+        .into();
+
+    s.sort_by(|a, b| a.0.cmp(&b.0));
+
+    Ok(s)
 }
 
 #[cfg(test)]
@@ -121,7 +173,10 @@ mod tests {
     use super::*;
     #[test]
     fn parse() {
-        let s: Schedule = serde_json::from_str::<Response>(include_str!("../fixtures/spot_slots.json")).expect("should be ok").into();
+        let s: FreeSlotsDay =
+            serde_json::from_str::<Response>(include_str!("../fixtures/spot_slots.json"))
+                .expect("should be ok")
+                .into();
         println!("{:?}", s);
     }
 }

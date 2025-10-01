@@ -12,6 +12,7 @@ pub struct AppState {
     config: Factory<Arc<Config>>,
     pg: Factory<Arc<Pool>>,
     user_store: Factory<Arc<UserStore>>,
+    http_client: Factory<Arc<reqwest::Client>>,
 }
 
 impl AppState {
@@ -25,6 +26,10 @@ impl AppState {
 
     pub fn user_store(&self) -> Arc<UserStore> {
         self.resolve(&self.user_store)
+    }
+
+    pub fn http_client(&self) -> Arc<reqwest::Client> {
+        self.resolve(&self.http_client)
     }
 }
 
@@ -41,6 +46,7 @@ impl Default for AppState {
                 Arc::new(pool)
             }),
             user_store: Factory::once(|state| Arc::new(UserStore::new(state.pg()))),
+            http_client: Factory::once(|_| Arc::new(reqwest::Client::new())),
         }
     }
 }

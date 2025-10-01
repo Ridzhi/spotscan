@@ -14,6 +14,7 @@ use serde_derive::{Deserialize, Serialize};
 use crate::prelude::*;
 
 pub mod user;
+pub mod spot;
 
 pub struct ExtractUser(TgUser);
 

@@ -41,6 +41,19 @@ export type AppTheme = typeof AppTheme[keyof typeof AppTheme];
 /**
  * 
  * @export
+ * @interface GetUserSlots
+ */
+export interface GetUserSlots {
+    /**
+     * 
+     * @type {Array<Array<any>>}
+     * @memberof GetUserSlots
+     */
+    'data': Array<Array<any>>;
+}
+/**
+ * 
+ * @export
  * @interface Res
  */
 export interface Res {
@@ -260,6 +273,35 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserSlots: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v1/spot/slots`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {UpdateUserSettingsRequest} updateUserSettingsRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -316,6 +358,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUserSlots(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetUserSlots>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUserSlots(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getUserSlots']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {UpdateUserSettingsRequest} updateUserSettingsRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -346,6 +399,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserSlots(options?: RawAxiosRequestConfig): AxiosPromise<GetUserSlots> {
+            return localVarFp.getUserSlots(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {UpdateUserSettingsRequest} updateUserSettingsRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -371,6 +432,16 @@ export class DefaultApi extends BaseAPI {
      */
     public getUser(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getUser(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getUserSlots(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getUserSlots(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
