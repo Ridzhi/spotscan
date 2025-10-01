@@ -82,53 +82,7 @@
           "System"
         ]
       },
-      "GetUserSlots": {
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/ResSlots"
-          }
-        }
-      },
-      "Res": {
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/User"
-          }
-        }
-      },
-      "ResDaySlot": {
-        "type": "object",
-        "required": [
-          "date",
-          "windows"
-        ],
-        "properties": {
-          "date": {
-            "type": "string"
-          },
-          "windows": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ResWindow"
-            }
-          }
-        }
-      },
-      "ResSlots": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/ResDaySlot"
-        }
-      },
-      "ResWindow": {
+      "FreeSlot": {
         "type": "object",
         "required": [
           "field",
@@ -140,6 +94,56 @@
           },
           "window": {
             "$ref": "#/components/schemas/TimeWindow"
+          }
+        }
+      },
+      "FreeSlotWeek": {
+        "type": "object",
+        "required": [
+          "date",
+          "slots"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "slots": {
+            "$ref": "#/components/schemas/FreeSlots"
+          }
+        }
+      },
+      "FreeSlots": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/FreeSlot"
+        }
+      },
+      "FreeSlotsWeek": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/FreeSlotWeek"
+        }
+      },
+      "GetUserSlots": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/FreeSlotsWeek"
+          }
+        }
+      },
+      "Res": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/User"
           }
         }
       },

@@ -28,28 +28,37 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .collect::<Vec<_>>();
 
         for date in dates {
-            handler(state.clone(),&bot, &client, date).await;
+            match handler(state.clone(),&bot, &client, date).await {
+                Ok(_) => {}
+                Err(err) => {
+                    error!("handler error: {}", err);
+                }
+            };
             tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
         }
 
-        tokio::time::sleep(tokio::time::Duration::from_secs(60)).await;
+        tokio::time::sleep(tokio::time::Duration::from_secs(60 * 10)).await;
     }
 }
 
 
 async fn handler(state: Arc<AppState>, bot: &TgClient, client: &reqwest::Client, date: OffsetDateTime) -> Result<()> {
-    info!("Handle {}", date.weekday());
-
     let users = state.user_store().find_many(vec![UserOption::Enabled(date.weekday())]).await?;
 
     if users.is_empty() {
         return Ok(());
     }
 
-    let schedule = get_schedule(bot, client, date).await?;
+    // let schedule = get_schedule(bot, client, date).await?;
+    let free_slots = spot::get_free_slots(state.clone(), &date).await?;
 
     for user in users {
+        info!("Handle day {} user {}", date.weekday(), user.tg_user_id);
         let mut matches = vec![];
+
+        free_slots.iter().for_each(|slot| {
+
+        });
 
         for (playground_number, windows) in &schedule {
             for window in windows {

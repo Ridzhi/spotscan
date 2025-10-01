@@ -206,7 +206,20 @@ pub fn now_utc() -> PrimitiveDateTime {
 }
 
 #[derive(Serialize, Deserialize, Default, Debug, ToSchema)]
-pub struct FreeSlotsDay(pub Vec<FieldSlot>);
+pub struct FreeSlots(pub Vec<FreeSlot>);
+
+impl Deref for FreeSlots {
+    type Target = Vec<FreeSlot>;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, ToSchema)]
+pub struct FreeSlot{
+    pub field: FieldNumber,
+    pub window: TimeWindow,
+}
 
 #[derive(Serialize, Deserialize, Default, Debug, ToSchema)]
 pub struct FieldSlot {
@@ -215,22 +228,22 @@ pub struct FieldSlot {
 }
 
 #[derive(Serialize, Deserialize, Default, Debug ,ToSchema)]
-pub struct FreeSlots(pub Vec<DaySlot>);
+pub struct FreeSlotsWeek(pub Vec<FreeSlotWeek>);
 
 #[derive(Serialize, Deserialize, Debug ,ToSchema)]
-pub struct DaySlot {
+pub struct FreeSlotWeek {
     pub date: OffsetDateTime,
-    pub slots: FreeSlotsDay,
+    pub slots: FreeSlots,
 }
 
-impl Deref for FreeSlotsDay {
-    type Target = Vec<FieldSlot>;
+impl Deref for FreeSlotsWeek {
+    type Target = Vec<FreeSlotWeek>;
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
-impl DerefMut for FreeSlotsDay {
+impl DerefMut for FreeSlotsWeek {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }
