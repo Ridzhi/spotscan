@@ -1,9 +1,9 @@
 use crate::prelude::*;
-use log::{info, error};
+use log::{error, info};
+use reqwest::Error;
 use serde::{Deserialize, de::Deserializer};
 use std::collections::HashMap;
 use std::sync::Arc;
-use reqwest::Error;
 use time::{OffsetDateTime, Time, macros::format_description};
 
 static URL: &str = "https://atlanticspot.ru/api/booking/times.php";
@@ -157,12 +157,10 @@ pub async fn get_user_free_slots(state: Arc<AppState>, user: &User) -> Result<Fr
             .await?
             .0
             .into_iter()
-            .filter(|slot| {
-                user.match_window(date.weekday(), &slot.window)
-            })
+            .filter(|slot| user.match_window(date.weekday(), &slot.window))
             .collect::<Vec<FreeSlot>>();
 
-        user_free_slots.sort_by(|a, b| {a.window.start.cmp(&b.window.start)});
+        user_free_slots.sort_by(|a, b| a.window.start.cmp(&b.window.start));
 
         result.0.push(FreeSlotWeek {
             date,
@@ -174,50 +172,19 @@ pub async fn get_user_free_slots(state: Arc<AppState>, user: &User) -> Result<Fr
 }
 
 pub async fn get_free_slots(state: Arc<AppState>, date: &OffsetDateTime) -> Result<FreeSlots> {
-    let req = state
+    let mut s: FreeSlots = state
         .http_client()
         .get(URL)
         .query(&[(
             "bookingDate",
             date.format(format_description!("[day].[month].[year]"))
                 .expect("date.format failed"),
-        )]);
-
-    info!("get_free_slots req.send {req:?}");
-
-    let res = req.send().await;
-
-    let res = match res{
-        Ok(v) => v,
-        Err(e) => {
-            error!("get_free_slots send error {}", e);
-            return Err(AppError::from(e));
-        }
-    };
-
-    let res = match res.json::<Response>().await {
-        Ok(v) => v,
-        Err(e) => {
-            error!("get_free_slots json {}", e);
-            return Err(AppError::from(e));
-        }
-    };
-
-    let mut s: FreeSlots = res.into();
-
-    // let mut s: FreeSlots = state
-    //     .http_client()
-    //     .get(URL)
-    //     .query(&[(
-    //         "bookingDate",
-    //         date.format(format_description!("[day].[month].[year]"))
-    //             .expect("date.format failed"),
-    //     )])
-    //     .send()
-    //     .await?
-    //     .json::<Response>()
-    //     .await?
-    //     .into();
+        )])
+        .send()
+        .await?
+        .json::<Response>()
+        .await?
+        .into();
 
     s.0.sort_by(|a, b| a.field.cmp(&b.field));
 

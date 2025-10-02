@@ -56,13 +56,9 @@ async fn handler(
         return Ok(());
     }
 
-    info!("expect handle users count = {} for date = {}", users.len(), &date);
-
     let free_slots = spot::get_free_slots(state.clone(), &date).await?;
 
     for user in users {
-        info!("Handle day {} user {}", date.weekday(), user.tg_user_id);
-
         let body = free_slots
             .iter()
             .filter(|slot| user.match_window(date.weekday(), &slot.window))
@@ -75,8 +71,6 @@ async fn handler(
         }
 
         let tg_message = format!("{}\n{}", get_message_date(&date), body.join("\n"));
-
-        info!("Sending message: {}", tg_message);
 
         match bot.send_message(
             user,
