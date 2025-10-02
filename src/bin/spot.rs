@@ -38,7 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
         }
 
-        tokio::time::sleep(tokio::time::Duration::from_secs(60 * 1)).await;
+        tokio::time::sleep(tokio::time::Duration::from_secs(60 * 5)).await;
     }
 }
 
