@@ -29,7 +29,7 @@ function formatDate(date: string) {
     С учетом ваших фильтров
   </template>
 
-  <template v-for="(item, index) in data" :key="index">
+  <template v-if="data.length" v-for="(item, index) in data" :key="index">
     <van-cell-group v-if="item.slots.length" :title="`${formatDate(item.date)}`" inset>
       <template v-for="(slot, j) in item.slots" :key="j">
         <van-cell
@@ -41,5 +41,6 @@ function formatDate(date: string) {
 
     <MainGap />
   </template>
+    <van-empty v-else image="search" description="Нет подходящих слотов"/>
 </AppPage>
 </template>

@@ -160,6 +160,10 @@ pub async fn get_user_free_slots(state: Arc<AppState>, user: &User) -> Result<Fr
             .filter(|slot| user.match_window(date.weekday(), &slot.window))
             .collect::<Vec<FreeSlot>>();
 
+        if user_free_slots.is_empty() {
+            continue;
+        }
+        
         user_free_slots.sort_by(|a, b| a.window.start.cmp(&b.window.start));
 
         result.0.push(FreeSlotWeek {
