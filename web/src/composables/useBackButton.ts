@@ -2,13 +2,15 @@ import { backButton } from '@telegram-apps/sdk-vue'
 import { watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+const tabRoutes = ['slots', 'settings'];
+
 export function useBackButton() {
     let offClick: () => void = () => {}
     const route = useRoute()
     const router = useRouter()
 
     watch(() => route.name, () => {
-        if (route.name === 'index') {
+        if (tabRoutes.includes(route.name as string)) {
             backButton.hide()
             offClick()
         } else if (!backButton.isVisible()) {

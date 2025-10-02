@@ -18,11 +18,14 @@ app.use(VueInputAutowidth);
 
 app.use(Vant);
 
-import { retrieveLaunchParams } from '@telegram-apps/sdk-vue';
+import { retrieveLaunchParams, postEvent } from '@telegram-apps/sdk-vue';
 import { init } from './init';
 // Mock the environment in case, we are outside Telegram.
 import './mockEnv'
 
 init(retrieveLaunchParams().startParam === 'debug' || import.meta.env.DEV);
+
+// postEvent('web_app_expand');
+// postEvent('web_app_setup_closing_behavior', {need_confirmation: false});
 
 app.mount('#app');

@@ -1,5 +1,6 @@
 import {
     backButton,
+    closeMiniApp,
     viewport,
     miniApp,
     initData,
@@ -41,5 +42,6 @@ export function init(debug: boolean): void {
         })
         .then(() => {
             viewport.bindCssVars();
+            viewport.expand();
         });
 }
