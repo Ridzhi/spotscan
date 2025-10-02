@@ -78,16 +78,16 @@ async fn handler(
 
         info!("Sending message: {}", tg_message);
 
-        // match bot.send_message(
-        //     user,
-        //     InputMessage::new().text(tg_message),
-        // )
-        // .await {
-        //     Ok(v) => {}
-        //     Err(e) => {
-        //         error!("bot.send_message {}", e);
-        //     }
-        // }
+        match bot.send_message(
+            user,
+            InputMessage::new().text(tg_message),
+        )
+        .await {
+            Ok(v) => {}
+            Err(e) => {
+                error!("bot.send_message {}", e);
+            }
+        }
     }
 
     Ok(())
