@@ -1,9 +1,10 @@
-use grammers_client::{Client as TgClient, InputMessage};
+use grammers_client::{Client as TgClient, InputMessage, InvocationError};
 use log::{error, info};
 use reqwest;
 use spotscan::{prelude::*, spot};
 use std::ops::Add;
 use std::sync::Arc;
+use grammers_client::types::Message;
 use time::{
     Duration, OffsetDateTime, Weekday,
     macros::{format_description, offset},
@@ -66,14 +67,23 @@ async fn handler(
             .iter()
             .filter(|slot| user.match_window(date.weekday(), &slot.window))
             .map(|slot| create_message(slot.field, &slot.window))
-            .collect::<Vec<String>>()
-            .join("\n");
+            .collect::<Vec<String>>();
 
-        bot.send_message(
+        if body.is_empty() {
+            info!("No available slots for user {}, skip", user.tg_user_id);
+            continue;
+        }
+
+        match bot.send_message(
             user,
-            InputMessage::new().text(format!("{}\n{}", get_message_date(&date), body)),
+            InputMessage::new().text(format!("{}\n{}", get_message_date(&date), body.join("\n"))),
         )
-        .await?;
+        .await {
+            Ok(v) => {}
+            Err(e) => {
+                error!("bot.send_message {}", e);
+            }
+        }
     }
 
     Ok(())
