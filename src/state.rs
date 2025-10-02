@@ -46,7 +46,14 @@ impl Default for AppState {
                 Arc::new(pool)
             }),
             user_store: Factory::once(|state| Arc::new(UserStore::new(state.pg()))),
-            http_client: Factory::once(|_| Arc::new(reqwest::Client::new())),
+            http_client: Factory::once(|_| {
+                let client = reqwest::Client::builder()
+                    .user_agent("Safari/537.36")
+                    .build()
+                    .expect("build http client");
+
+                Arc::new(client)
+            }),
         }
     }
 }
