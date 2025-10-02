@@ -30,7 +30,7 @@ function formatDate(date: string) {
   </template>
 
   <template v-for="(item, index) in data" :key="index">
-    <van-cell-group :title="`${formatDate(item.date)}`" inset>
+    <van-cell-group v-if="item.slots.length" :title="`${formatDate(item.date)}`" inset>
       <template v-for="(slot, j) in item.slots" :key="j">
         <van-cell
             :title="`${slot.window.start.slice(0, 5)} - ${slot.window.end.slice(0, 5)}`"
