@@ -38,7 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
         }
 
-        tokio::time::sleep(tokio::time::Duration::from_secs(60 * 10)).await;
+        tokio::time::sleep(tokio::time::Duration::from_secs(60 * 1)).await;
     }
 }
 
@@ -74,16 +74,20 @@ async fn handler(
             continue;
         }
 
-        match bot.send_message(
-            user,
-            InputMessage::new().text(format!("{}\n{}", get_message_date(&date), body.join("\n"))),
-        )
-        .await {
-            Ok(v) => {}
-            Err(e) => {
-                error!("bot.send_message {}", e);
-            }
-        }
+        let tg_message = format!("{}\n{}", get_message_date(&date), body.join("\n"));
+
+        info!("Sending message: {}", tg_message);
+
+        // match bot.send_message(
+        //     user,
+        //     InputMessage::new().text(tg_message),
+        // )
+        // .await {
+        //     Ok(v) => {}
+        //     Err(e) => {
+        //         error!("bot.send_message {}", e);
+        //     }
+        // }
     }
 
     Ok(())
