@@ -52,10 +52,6 @@ impl Into<FreeSlots> for Response {
                 let entry = s.entry(item.0).or_default();
 
                 if let Some(v) = entry.last_mut() {
-                    // if item.1.fixed || v.fixed {
-                    //     return
-                    // }
-
                     if !item.1.fixed && !v.fixed && item.1.start.eq(&v.end) {
                         v.end = item.1.end;
                         return;

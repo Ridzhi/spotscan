@@ -188,10 +188,6 @@ pub struct WindowSettings {
     pub starts: Option<AppTime>,
     pub ends: Option<AppTime>,
 }
-// слот должен проходить проверку на:
-//  - начинается не раньше указанной границы
-//  - заканчивается не позже указанной границы
-//  - имеет длительность не меньше заданной
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct UtcDateTime(pub PrimitiveDateTime);
@@ -230,12 +226,6 @@ pub struct FreeSlot{
     pub window: TimeWindow,
 }
 
-#[derive(Serialize, Deserialize, Default, Debug, ToSchema)]
-pub struct FieldSlot {
-    pub field: FieldNumber,
-    pub windows: Vec<TimeWindow>,
-}
-
 #[derive(Serialize, Deserialize, Default, Debug ,ToSchema)]
 pub struct FreeSlotsWeek(pub Vec<FreeSlotWeek>);
 
@@ -257,8 +247,6 @@ impl DerefMut for FreeSlotsWeek {
         &mut self.0
     }
 }
-
-pub type Schedule = HashMap<FieldNumber, Vec<TimeWindow>>;
 
 pub struct DateIter {
     now: OffsetDateTime,
@@ -350,18 +338,4 @@ pub enum AppTheme {
     #[postgres(name = "SYSTEM")]
     #[strum(to_string = "SYSTEM")]
     System,
-}
-
-pub fn get_human_day(date: &OffsetDateTime) -> String {
-    let weekday = match date.weekday() {
-        Weekday::Monday => "Пн",
-        Weekday::Tuesday => "Вт",
-        Weekday::Wednesday => "Ср",
-        Weekday::Thursday => "Чт",
-        Weekday::Friday => "Пт",
-        Weekday::Saturday => "Сб",
-        Weekday::Sunday => "Вск"
-    };
-
-    format!("{},{}", weekday, date.day())
 }
