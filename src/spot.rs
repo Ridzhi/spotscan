@@ -1,12 +1,13 @@
 use crate::prelude::*;
-use log::{error, info};
-use reqwest::Error;
+use log::{info};
 use serde::{Deserialize, de::Deserializer};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use time::{OffsetDateTime, Time, macros::format_description};
 
 static URL: &str = "https://atlanticspot.ru/api/booking/times.php";
+
+type GroupId = String;
 
 #[derive(Deserialize)]
 pub struct Response(pub Vec<Slot>);
@@ -14,31 +15,34 @@ pub struct Response(pub Vec<Slot>);
 impl Into<FreeSlots> for Response {
     fn into(self) -> FreeSlots {
         let mut s: HashMap<FieldNumber, Vec<TimeWindow>> = Default::default();
+        let mut groups: HashSet<GroupId> = HashSet::new();
 
         self.0
             .into_iter()
             .map(|item| {
-                let mut slots: Vec<(u8, TimeWindow)> = vec![];
-                let tw: TimeWindow = item.times.into();
+                let mut slots: Vec<(FieldNumber, TimeWindow)> = vec![];
+                let tw: TimeWindow = item.times.clone().into_time_window(false);
 
-                if item.plgr_1.free {
-                    slots.push((1, tw.clone()))
-                }
+                for (i, field) in item.fields().iter().enumerate() {
+                    if !field.free {
+                        continue;
+                    }
 
-                if item.plgr_2.free {
-                    slots.push((2, tw.clone()))
-                }
+                    match &field.group {
+                        None => slots.push(((i + 1) as FieldNumber, tw.clone())),
+                        Some(v) => {
+                            if groups.contains(&v.group_id) {
+                                continue;
+                            }
 
-                if item.plgr_3.free {
-                    slots.push((3, tw.clone()))
-                }
+                            if let Some(t) = &v.group_time {
+                                groups.insert(v.group_id.clone());
 
-                if item.plgr_4.free {
-                    slots.push((4, tw.clone()))
-                }
-
-                if item.plgr_5.free {
-                    slots.push((5, tw.clone()))
+                                let gt: TimeWindow = t.clone().into_time_window(true);
+                                slots.push(((i + 1) as FieldNumber, gt.clone()));
+                            }
+                        }
+                    }
                 }
 
                 slots
@@ -48,7 +52,11 @@ impl Into<FreeSlots> for Response {
                 let entry = s.entry(item.0).or_default();
 
                 if let Some(v) = entry.last_mut() {
-                    if item.1.start.eq(&v.end) {
+                    // if item.1.fixed || v.fixed {
+                    //     return
+                    // }
+
+                    if !item.1.fixed && !v.fixed && item.1.start.eq(&v.end) {
                         v.end = item.1.end;
                         return;
                     }
@@ -83,6 +91,18 @@ pub struct Slot {
     pub plgr_5: Plgr,
 }
 
+impl Slot {
+    pub fn fields(&self) -> [&Plgr; 5] {
+        [
+            &self.plgr_1,
+            &self.plgr_2,
+            &self.plgr_3,
+            &self.plgr_4,
+            &self.plgr_5,
+        ]
+    }
+}
+
 #[derive(Deserialize)]
 pub struct Plgr {
     pub price: String,
@@ -101,13 +121,14 @@ pub struct PlgrGroup {
 #[derive(Deserialize, Clone)]
 pub struct SlotTime(pub String);
 
-impl Into<TimeWindow> for SlotTime {
-    fn into(self) -> TimeWindow {
+impl SlotTime {
+    fn into_time_window(self, fixed: bool) -> TimeWindow {
         let segments = self.0.split(" - ").collect::<Vec<&str>>();
 
         let format = format_description!("[hour]:[minute]");
 
         TimeWindow {
+            fixed,
             start: Time::parse(segments.get(0).expect("cant get timeslot.from"), &format)
                 .expect("cant parse timeslot.from")
                 .into(),
@@ -163,7 +184,7 @@ pub async fn get_user_free_slots(state: Arc<AppState>, user: &User) -> Result<Fr
         if user_free_slots.is_empty() {
             continue;
         }
-        
+
         user_free_slots.sort_by(|a, b| a.window.start.cmp(&b.window.start));
 
         result.0.push(FreeSlotWeek {
@@ -197,6 +218,8 @@ pub async fn get_free_slots(state: Arc<AppState>, date: &OffsetDateTime) -> Resu
 
 #[cfg(test)]
 mod tests {
+    use std::fs::File;
+    use std::io::Write;
     use super::*;
     #[test]
     fn parse() {
@@ -205,5 +228,9 @@ mod tests {
                 .expect("should be ok")
                 .into();
         println!("{:?}", s);
+
+        let mut file = File::create("./fixtures/free_slots_merged.json").expect("create file failed");
+
+        file.write_all(serde_json::to_string(&s).unwrap().as_bytes());
     }
 }

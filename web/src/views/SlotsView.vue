@@ -32,10 +32,14 @@ function formatDate(date: string) {
   <template v-if="data.length" v-for="(item, index) in data" :key="index">
     <van-cell-group v-if="item.slots.length" :title="`${formatDate(item.date)}`" inset>
       <template v-for="(slot, j) in item.slots" :key="j">
-        <van-cell
-            :title="`${slot.window.start.slice(0, 5)} - ${slot.window.end.slice(0, 5)}`"
-            :value="`#${slot.field}`"
-        />
+        <van-cell :value="`#${slot.field}`">
+          <template #title>
+            {{ `${slot.window.start.slice(0, 5)} - ${slot.window.end.slice(0, 5)}` }}
+            <van-tag v-if="slot.window.fixed" plain round type="primary" style="margin-left: var(--van-padding-xs)">
+              фикс. время
+            </van-tag>
+          </template>
+        </van-cell>
       </template>
     </van-cell-group>
 

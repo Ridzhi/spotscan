@@ -56,8 +56,15 @@ pub struct User {
 
 impl User {
     pub fn match_window(&self, d: Weekday, w: &TimeWindow) -> bool {
-        let from = std::cmp::max(self.settings.get_starts(d).0, w.start.0);
-        let to = std::cmp::min(self.settings.get_ends(d).0, w.end.0);
+        let user_starts = self.settings.get_starts(d).0;
+        let user_ends = self.settings.get_ends(d).0;
+
+        if w.fixed && (user_starts.gt(&w.start.0) || user_ends.lt(&w.end.0)) {
+            return false;
+        }
+
+        let from = std::cmp::max(user_starts, w.start.0);
+        let to = std::cmp::min(user_ends, w.end.0);
 
         if from >= to {
             return false;
@@ -292,6 +299,7 @@ impl Iterator for DateIter {
 
 #[derive(Serialize, Deserialize, Clone, Debug, ToSchema)]
 pub struct TimeWindow {
+    pub fixed: bool,
     pub start: AppTime,
     pub end: AppTime,
 }

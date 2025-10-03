@@ -6,6 +6,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **end** | **string** |  | [default to undefined]
+**fixed** | **boolean** |  | [default to undefined]
 **start** | **string** |  | [default to undefined]
 
 ## Example
@@ -15,6 +16,7 @@ import { TimeWindow } from './api';
 
 const instance: TimeWindow = {
     end,
+    fixed,
     start,
 };
 ```

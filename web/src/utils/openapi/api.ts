@@ -149,6 +149,12 @@ export interface TimeWindow {
     'end': string;
     /**
      * 
+     * @type {boolean}
+     * @memberof TimeWindow
+     */
+    'fixed': boolean;
+    /**
+     * 
      * @type {string}
      * @memberof TimeWindow
      */

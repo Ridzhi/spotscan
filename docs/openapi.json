@@ -184,12 +184,16 @@
       "TimeWindow": {
         "type": "object",
         "required": [
+          "fixed",
           "start",
           "end"
         ],
         "properties": {
           "end": {
             "$ref": "#/components/schemas/Time"
+          },
+          "fixed": {
+            "type": "boolean"
           },
           "start": {
             "$ref": "#/components/schemas/Time"
