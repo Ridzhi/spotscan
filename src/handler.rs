@@ -48,7 +48,7 @@ impl FromRequestParts<Arc<AppState>> for ExtractUser {
             return Err(StatusCode::UNAUTHORIZED);
         }
 
-        match tg::validate(segments[1], &state.config().tg.bottoken, None) {
+        match tg::validate(segments[1], &state.config().tg.bottoken, Some(0)) {
             Ok(v) => {
                 if let Some(u) = v.user {
                     return Ok(ExtractUser(TgUser { id: u.id }));
@@ -62,7 +62,7 @@ impl FromRequestParts<Arc<AppState>> for ExtractUser {
                 Err(StatusCode::UNAUTHORIZED)
             }
             Err(e) => {
-                tracing::error!("invalid tg launch params({:?}): {}", segments[1], e);
+                tracing::error!("invalid tg launch params(err={}), query({:?})", e, segments[1]);
 
                 Err(StatusCode::UNAUTHORIZED)
             }
