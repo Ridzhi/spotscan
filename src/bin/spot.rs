@@ -74,12 +74,12 @@ async fn handler(
 
         match bot.send_message(
             user,
-            InputMessage::new().text(tg_message),
+            InputMessage::new().text(tg_message.clone()),
         )
         .await {
             Ok(v) => {}
             Err(e) => {
-                error!("bot.send_message {}", e);
+                error!("bot.send_message: {}, message {}", e, tg_message);
             }
         }
     }
