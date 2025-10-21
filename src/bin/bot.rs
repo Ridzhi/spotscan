@@ -22,8 +22,7 @@ fn main() -> Result<()> {
         .block_on(async_main())
 }
 
-async fn handle_update(client: Client, state: Arc<AppState>, update: Update) -> Result<()> {
-    let c = state.config();
+async fn handle_update(_: Client, state: Arc<AppState>, update: Update) -> Result<()> {
     match update {
         Update::NewMessage(message) if !message.outgoing() && message.text().len() > 0 => {
             let is_new_message = if let tl::enums::Update::NewMessage(nm) = &message.raw {
@@ -45,10 +44,10 @@ async fn handle_update(client: Client, state: Arc<AppState>, update: Update) -> 
                 return Ok(());
             }
 
-            let user = match state.user_store().find(chat.id()).await? {
+            match state.user_store().find(chat.id()).await? {
                 Some(v) => v,
                 None => {
-                    message.respond("Кажется это ваш первый визит. Здесь можно смотреть свободные слоты клуба SPOT по заданным фильтрам а также настроить бота, который будет следить за появлением свободных слотов в интересующий вас промежуток").await?;
+                    message.respond("Кажется это ваш первый визит. Здесь можно смотреть свободные слоты клуба SPOT (https://atlanticspot.ru) по заданным фильтрам а также настроить бота, который будет следить за обновлениями свободных слотов с учетом ваших фильтров").await?;
 
                     info!("first visit for id={}", chat.id());
                     let u = setup_user(state, &packed).await?;

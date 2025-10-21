@@ -45,7 +45,7 @@ async fn handler(
     bot: &TgClient,
     date: OffsetDateTime,
 ) -> Result<()> {
-    let mut users = state
+    let users = state
         .user_store()
         .find_many(vec![UserOption::Enabled(date.weekday())])
         .await?;
