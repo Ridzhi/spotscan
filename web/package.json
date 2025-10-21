@@ -12,7 +12,8 @@
     "build-only": "vite build --mode prod",
     "type-check": "vue-tsc --build --force",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
-    "lint:fix": "eslint . --report-unused-disable-directives --max-warnings 0 --fix"
+    "lint:fix": "eslint . --report-unused-disable-directives --max-warnings 0 --fix",
+    "fmt": "prettier --write src/"
   },
   "dependencies": {
     "@telegram-apps/sdk-vue": "2.0.31",
@@ -42,6 +43,7 @@
     "eslint-plugin-vue": "^9.30.0",
     "gh-pages": "^6.2.0",
     "npm-run-all2": "^7.0.1",
+    "prettier": "^3.6.2",
     "typescript": "~5.6.3",
     "vite": "^5.4.10",
     "vite-plugin-mkcert": "^1.17.6",
