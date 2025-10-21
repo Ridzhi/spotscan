@@ -41,10 +41,7 @@ impl FromRow for User {
                 let v: serde_json::Value = row.value(UserIden::LastSlots, table_prefix);
                 let res: Option<Vec<Slot>> = serde_json::from_value(v).expect("impl FromRow for User: last_slots key");
 
-                match res {
-                    None => None,
-                    Some(v) => Some(Slots(v))
-                }
+                res.map(|x| Slots(x))
             },
             settings: {
                 let v: serde_json::Value = row.value(UserIden::Settings, table_prefix);
