@@ -19,7 +19,7 @@ impl From<Response> for Slots {
 
         response.0
             .into_iter()
-            .map(|item| {
+            .flat_map(|item| {
                 let mut slots: Vec<(FieldNumber, TimeWindow)> = vec![];
                 let tw: TimeWindow = item.times.clone().into_time_window(false);
 
@@ -47,7 +47,6 @@ impl From<Response> for Slots {
 
                 slots
             })
-            .flatten()
             .for_each(|item| {
                 let entry = s.entry(item.0).or_default();
 
