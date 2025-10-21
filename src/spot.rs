@@ -126,6 +126,7 @@ impl SlotTime {
 
         TimeWindow {
             fixed,
+            #[allow(clippy::get_first)]
             start: Time::parse(segments.get(0).expect("cant get timeslot.from"), &format)
                 .expect("cant parse timeslot.from")
                 .into(),
@@ -155,7 +156,7 @@ where
 }
 
 pub async fn get_user_free_slots(state: Arc<AppState>, user: &User) -> Result<SlotsWeek> {
-    let dates = DateIter::new().into_iter().filter(|d| {
+    let dates = DateIter::new().filter(|d| {
         user.settings
             .slots
             .get(&d.weekday().into())

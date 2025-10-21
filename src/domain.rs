@@ -88,12 +88,12 @@ impl User {
     }
 }
 
-impl Into<PackedChat> for User {
-    fn into(self) -> PackedChat {
+impl From<User> for PackedChat {
+    fn from(value: User) -> Self {
         PackedChat {
             ty: PackedType::User,
-            id: self.tg_user_id,
-            access_hash: self.tg_user_access_hash.into(),
+            id: value.tg_user_id,
+            access_hash: value.tg_user_access_hash.into(),
         }
     }
 }
