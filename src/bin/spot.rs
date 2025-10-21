@@ -8,7 +8,6 @@ use time::{
     Duration, OffsetDateTime, Weekday,
     macros::{format_description, offset},
 };
-use tokio;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
