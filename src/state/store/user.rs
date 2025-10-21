@@ -38,13 +38,12 @@ impl FromRow for User {
             tg_user_id: row.value(UserIden::TgUserId, table_prefix),
             tg_user_access_hash: row.value(UserIden::TgUserAccessHash, table_prefix),
             last_slots: {
-                let raw: Option<serde_json::Value> = row.value(UserIden::LastSlots, table_prefix);
+                let v: serde_json::Value = row.value(UserIden::LastSlots, table_prefix);
+                let res: Option<Vec<Slot>> = serde_json::from_value(v).expect("impl FromRow for User: last_slots key");
 
-                if let Some(v) = raw {
-                    let res: Vec<Slot> = serde_json::from_value(v).expect("impl FromRow for User: last_slots key");
-                    Some(Slots(res))
-                } else {
-                    None
+                match res {
+                    None => None,
+                    Some(v) => Some(Slots(v))
                 }
             },
             settings: {

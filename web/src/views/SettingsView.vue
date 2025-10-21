@@ -70,7 +70,7 @@ async function onSwitchDayEnabled(day: Weekday, enabled: boolean) {
       <van-cell
         center
         title="Уведомления включены"
-        label="Каждые 5 минут будет приходить сводка по свободным слотам с учетом ваших фильтров"
+        label="В канал будут приходить изменения по свободным слотам (с учетом фильтров)"
       >
         <template #right-icon>
           <van-switch

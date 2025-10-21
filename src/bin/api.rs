@@ -28,7 +28,6 @@ async fn main() {
 
     let config = state.config().clone();
 
-    // build our application with a single route
     let (app, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
         .route("/ping", get(async || { "pong"}))
         .nest("/v1/user", handler::user::router_v1(state.clone()))
@@ -44,7 +43,6 @@ async fn main() {
 
     let app = app.merge(Scalar::with_url("/doc/api", api));
 
-    // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", config.port))
         .await
         .unwrap();

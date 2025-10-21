@@ -23,11 +23,6 @@ import type { RequestArgs } from './base';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerMap } from './base';
 
-/**
- * 
- * @export
- * @enum {string}
- */
 
 export const AppTheme = {
     Light: 'Light',
@@ -38,270 +33,65 @@ export const AppTheme = {
 export type AppTheme = typeof AppTheme[keyof typeof AppTheme];
 
 
-/**
- * 
- * @export
- * @interface FreeSlot
- */
-export interface FreeSlot {
-    /**
-     * 
-     * @type {number}
-     * @memberof FreeSlot
-     */
-    'field': number;
-    /**
-     * 
-     * @type {TimeWindow}
-     * @memberof FreeSlot
-     */
-    'window': TimeWindow;
-}
-/**
- * 
- * @export
- * @interface FreeSlotWeek
- */
 export interface FreeSlotWeek {
-    /**
-     * 
-     * @type {string}
-     * @memberof FreeSlotWeek
-     */
     'date': string;
-    /**
-     * 
-     * @type {Array<FreeSlot>}
-     * @memberof FreeSlotWeek
-     */
-    'slots': Array<FreeSlot>;
+    'slots': Array<Slot>;
 }
-/**
- * 
- * @export
- * @interface GetUserSlots
- */
 export interface GetUserSlots {
-    /**
-     * 
-     * @type {Array<FreeSlotWeek>}
-     * @memberof GetUserSlots
-     */
     'data': Array<FreeSlotWeek>;
 }
-/**
- * 
- * @export
- * @interface Res
- */
 export interface Res {
-    /**
-     * 
-     * @type {User}
-     * @memberof Res
-     */
     'data': User;
 }
-/**
- * 
- * @export
- * @interface Settings
- */
 export interface Settings {
-    /**
-     * 
-     * @type {AppTheme}
-     * @memberof Settings
-     */
     'app_theme': AppTheme;
-    /**
-     * 
-     * @type {WindowDefaults}
-     * @memberof Settings
-     */
     'defaults': WindowDefaults;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof Settings
-     */
     'enabled': boolean;
-    /**
-     * 
-     * @type {{ [key: string]: WindowSettings; }}
-     * @memberof Settings
-     */
     'slots': { [key: string]: WindowSettings; };
 }
 
 
-/**
- * 
- * @export
- * @interface TimeWindow
- */
+export interface Slot {
+    'field': number;
+    'window': TimeWindow;
+}
 export interface TimeWindow {
-    /**
-     * 
-     * @type {string}
-     * @memberof TimeWindow
-     */
     'end': string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof TimeWindow
-     */
     'fixed': boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof TimeWindow
-     */
     'start': string;
 }
-/**
- * 
- * @export
- * @interface UpdateUserSettingsRequest
- */
 export interface UpdateUserSettingsRequest {
-    /**
-     * 
-     * @type {AppTheme}
-     * @memberof UpdateUserSettingsRequest
-     */
     'app_theme'?: AppTheme | null;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof UpdateUserSettingsRequest
-     */
     'enabled'?: boolean | null;
-    /**
-     * 
-     * @type {{ [key: string]: WindowSettings; }}
-     * @memberof UpdateUserSettingsRequest
-     */
     'slots'?: { [key: string]: WindowSettings; };
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdateUserSettingsRequest
-     */
     'window_default_duration'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdateUserSettingsRequest
-     */
     'window_default_ends'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdateUserSettingsRequest
-     */
     'window_default_starts'?: string;
 }
 
 
-/**
- * 
- * @export
- * @interface User
- */
 export interface User {
-    /**
-     * 
-     * @type {string}
-     * @memberof User
-     */
     'created_at': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof User
-     */
     'id': number;
-    /**
-     * 
-     * @type {Settings}
-     * @memberof User
-     */
+    'last_slots'?: Array<Slot>;
     'settings': Settings;
-    /**
-     * 
-     * @type {number}
-     * @memberof User
-     */
     'tg_user_access_hash': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof User
-     */
     'tg_user_id': number;
 }
-/**
- * 
- * @export
- * @interface WindowDefaults
- */
 export interface WindowDefaults {
-    /**
-     * 
-     * @type {string}
-     * @memberof WindowDefaults
-     */
     'duration': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof WindowDefaults
-     */
     'ends': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof WindowDefaults
-     */
     'starts': string;
 }
-/**
- * 
- * @export
- * @interface WindowSettings
- */
 export interface WindowSettings {
-    /**
-     * 
-     * @type {string}
-     * @memberof WindowSettings
-     */
     'duration'?: string | null;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof WindowSettings
-     */
     'enabled': boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof WindowSettings
-     */
     'ends'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof WindowSettings
-     */
     'starts'?: string;
 }
 
 /**
  * DefaultApi - axios parameter creator
- * @export
  */
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -403,7 +193,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
 /**
  * DefaultApi - functional programming interface
- * @export
  */
 export const DefaultApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
@@ -447,7 +236,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
 
 /**
  * DefaultApi - factory interface
- * @export
  */
 export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = DefaultApiFp(configuration)
@@ -482,16 +270,12 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
 
 /**
  * DefaultApi - object-oriented interface
- * @export
- * @class DefaultApi
- * @extends {BaseAPI}
  */
 export class DefaultApi extends BaseAPI {
     /**
      * 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
      */
     public getUser(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getUser(options).then((request) => request(this.axios, this.basePath));
@@ -501,7 +285,6 @@ export class DefaultApi extends BaseAPI {
      * 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
      */
     public getUserSlots(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getUserSlots(options).then((request) => request(this.axios, this.basePath));
@@ -512,7 +295,6 @@ export class DefaultApi extends BaseAPI {
      * @param {UpdateUserSettingsRequest} updateUserSettingsRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
      */
     public updateUserSettings(updateUserSettingsRequest: UpdateUserSettingsRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).updateUserSettings(updateUserSettingsRequest, options).then((request) => request(this.axios, this.basePath));

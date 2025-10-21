@@ -6,7 +6,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **date** | **string** |  | [default to undefined]
-**slots** | [**Array&lt;FreeSlot&gt;**](FreeSlot.md) |  | [default to undefined]
+**slots** | [**Array&lt;Slot&gt;**](Slot.md) |  | [default to undefined]
 
 ## Example
 

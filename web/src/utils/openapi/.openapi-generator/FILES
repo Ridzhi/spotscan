@@ -6,11 +6,11 @@ common.ts
 configuration.ts
 docs/AppTheme.md
 docs/DefaultApi.md
-docs/FreeSlot.md
 docs/FreeSlotWeek.md
 docs/GetUserSlots.md
 docs/Res.md
 docs/Settings.md
+docs/Slot.md
 docs/TimeWindow.md
 docs/UpdateUserSettingsRequest.md
 docs/User.md

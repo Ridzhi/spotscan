@@ -20,6 +20,16 @@ pub async fn handler(
         Err(e) => return e.into_response(),
     };
 
+    let filters_changed = req.enabled.is_some()
+        || req.window_default_duration.is_some()
+        || req.window_default_starts.is_some()
+        || req.window_default_ends.is_some()
+        || req.slots.is_some();
+
+    if filters_changed {
+        user.last_slots = None;
+    }
+
     if let Some(v) = req.enabled {
         user.settings.enabled = v;
     }
