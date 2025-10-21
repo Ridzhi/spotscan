@@ -1,3 +1,4 @@
+use sea_query::{SimpleExpr, Value};
 use super::*;
 
 #[derive(Iden, EnumIter)]
@@ -13,18 +14,24 @@ enum UserIden {
 }
 
 impl From<User> for InsertValues {
-    fn from(value: User) -> Self {
+    fn from(user: User) -> Self {
         vec![
-            value.tg_user_id.into(),
-            value.tg_user_access_hash.into(),
-            serde_json::to_value(value.last_slots)
-                .expect("impl Into<InsertValues> for User: last_slots key")
-                .into(),
-            serde_json::to_value(value.settings)
+            user.tg_user_id.into(),
+            user.tg_user_access_hash.into(),
+            {
+                if user.last_slots.is_none() {
+                    Value::Json(None).into()
+                } else {
+                    serde_json::to_value(user.last_slots)
+                        .expect("impl Into<InsertValues> for User: last_slots key")
+                        .into()
+                }
+            },
+            serde_json::to_value(user.settings)
                 .expect("impl Into<InsertValues> for User: settings key")
                 .into(),
             {
-                let v: time::PrimitiveDateTime = value.created_at.into();
+                let v: time::PrimitiveDateTime = user.created_at.into();
                 v.into()
             },
         ]
@@ -38,10 +45,15 @@ impl FromRow for User {
             tg_user_id: row.value(UserIden::TgUserId, table_prefix),
             tg_user_access_hash: row.value(UserIden::TgUserAccessHash, table_prefix),
             last_slots: {
-                let v: serde_json::Value = row.value(UserIden::LastSlots, table_prefix);
-                let res: Option<Vec<Slot>> = serde_json::from_value(v).expect("impl FromRow for User: last_slots key");
+                let raw: Option<serde_json::Value> = row.value(UserIden::LastSlots, table_prefix);
 
-                res.map(Slots)
+                if let Some(v) = raw {
+                    let res: Option<Vec<Slot>> = serde_json::from_value(v).expect("impl FromRow for User: last_slots key");
+
+                    res.map(Slots)
+                } else {
+                    None
+                }
             },
             settings: {
                 let v: serde_json::Value = row.value(UserIden::Settings, table_prefix);
