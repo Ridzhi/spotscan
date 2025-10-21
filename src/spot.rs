@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use log::{info};
+use log::info;
 use serde::{Deserialize, de::Deserializer};
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
@@ -17,7 +17,8 @@ impl From<Response> for Slots {
         let mut s: HashMap<FieldNumber, Vec<TimeWindow>> = Default::default();
         let mut groups: HashSet<GroupId> = HashSet::new();
 
-        response.0
+        response
+            .0
             .into_iter()
             .flat_map(|item| {
                 let mut slots: Vec<(FieldNumber, TimeWindow)> = vec![];
@@ -50,18 +51,20 @@ impl From<Response> for Slots {
             .for_each(|item| {
                 let entry = s.entry(item.0).or_default();
 
-                if let Some(v) = entry.last_mut() {
-                    if !item.1.fixed && !v.fixed && item.1.start.eq(&v.end) {
-                        v.end = item.1.end;
-                        return;
-                    }
+                if let Some(v) = entry.last_mut()
+                    && !item.1.fixed
+                    && !v.fixed
+                    && item.1.start.eq(&v.end)
+                {
+                    v.end = item.1.end;
+                    return;
                 }
                 entry.push(item.1);
             });
 
         Slots(
             s.into_iter()
-                .map(|item| {
+                .flat_map(|item| {
                     item.1
                         .into_iter()
                         .map(|tw| Slot {
@@ -70,7 +73,6 @@ impl From<Response> for Slots {
                         })
                         .collect::<Vec<Slot>>()
                 })
-                .flatten()
                 .collect(),
         )
     }
@@ -213,9 +215,9 @@ pub async fn get_free_slots(state: Arc<AppState>, date: &OffsetDateTime) -> Resu
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use std::fs::File;
     use std::io::Write;
-    use super::*;
     #[test]
     fn parse() {
         let s: Slots =
@@ -224,7 +226,8 @@ mod tests {
                 .into();
         println!("{:?}", s);
 
-        let mut file = File::create("./fixtures/free_slots_merged.json").expect("create file failed");
+        let mut file =
+            File::create("./fixtures/free_slots_merged.json").expect("create file failed");
 
         file.write_all(serde_json::to_string(&s).unwrap().as_bytes());
     }
