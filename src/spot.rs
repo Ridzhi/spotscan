@@ -12,12 +12,12 @@ type GroupId = String;
 #[derive(Deserialize)]
 pub struct Response(pub Vec<SSlot>);
 
-impl Into<Slots> for Response {
-    fn into(self) -> Slots {
+impl From<Response> for Slots {
+    fn from(response: Response) -> Slots {
         let mut s: HashMap<FieldNumber, Vec<TimeWindow>> = Default::default();
         let mut groups: HashSet<GroupId> = HashSet::new();
 
-        self.0
+        response.0
             .into_iter()
             .map(|item| {
                 let mut slots: Vec<(FieldNumber, TimeWindow)> = vec![];
