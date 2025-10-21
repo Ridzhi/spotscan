@@ -22,7 +22,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let spb_time = OffsetDateTime::now_utc().to_offset(offset!(+3:00));
 
         let dates = (0..8)
-            .into_iter()
             .map(|offset| spb_time.add(Duration::days(offset)))
             .collect::<Vec<_>>();
 
