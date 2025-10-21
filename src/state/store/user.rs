@@ -12,19 +12,19 @@ enum UserIden {
     CreatedAt,
 }
 
-impl Into<InsertValues> for User {
-    fn into(self) -> InsertValues {
+impl From<User> for InsertValues {
+    fn from(value: User) -> Self {
         vec![
-            self.tg_user_id.into(),
-            self.tg_user_access_hash.into(),
-            serde_json::to_value(self.last_slots)
+            value.tg_user_id.into(),
+            value.tg_user_access_hash.into(),
+            serde_json::to_value(value.last_slots)
                 .expect("impl Into<InsertValues> for User: last_slots key")
                 .into(),
-            serde_json::to_value(self.settings)
+            serde_json::to_value(value.settings)
                 .expect("impl Into<InsertValues> for User: settings key")
                 .into(),
             {
-                let v: time::PrimitiveDateTime = self.created_at.into();
+                let v: time::PrimitiveDateTime = value.created_at.into();
                 v.into()
             },
         ]
