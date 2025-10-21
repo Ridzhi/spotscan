@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import {useIndexStore} from "@/stores";
+import { useIndexStore } from '@/stores';
 
-const store =  useIndexStore();
+const store = useIndexStore();
 await store.load();
 </script>
 
 <template>
-  <slot
-      v-bind:theme="store.vanTheme"
-  />
+  <slot v-bind:theme="store.vanTheme" />
 </template>

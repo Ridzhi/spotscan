@@ -3,11 +3,10 @@ import 'vant/lib/index.css';
 import './assets/index.css';
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import { plugin as VueInputAutowidth } from 'vue-input-autowidth'
+import { plugin as VueInputAutowidth } from 'vue-input-autowidth';
 import App from './App.vue';
 import router from './router';
 import { errorHandler } from './errorHandler';
-
 
 const pinia = createPinia();
 const app = createApp(App);
@@ -21,7 +20,7 @@ app.use(Vant);
 import { retrieveLaunchParams, postEvent } from '@telegram-apps/sdk-vue';
 import { init } from './init';
 // Mock the environment in case, we are outside Telegram.
-import './mockEnv'
+import './mockEnv';
 
 init(retrieveLaunchParams().startParam === 'debug' || import.meta.env.DEV);
 

@@ -1,59 +1,60 @@
 :root {
-    --light-factor: .15;
-    --ton-brand-color: #0098EA;
-    --color-success-light: hsl(from var(--van-success-color) h s l / var(--light-factor));
-    --color-danger-light: hsl(from var(--van-danger-color) h s l / var(--light-factor));
+  --light-factor: 0.15;
+  --ton-brand-color: #0098ea;
+  --color-success-light: hsl(from var(--van-success-color) h s l / var(--light-factor));
+  --color-danger-light: hsl(from var(--van-danger-color) h s l / var(--light-factor));
 }
 
 /* van overrides */
 :root:root {
-    --van-radius-lg: 16px;
+  --van-radius-lg: 16px;
 
-    --van-tabbar-height: 76px;
-    --van-search-input-height: 48px;
-    --van-search-padding: var(--van-padding-sm) 0;
-    --van-switch-size: 22px;
+  --van-tabbar-height: 76px;
+  --van-search-input-height: 48px;
+  --van-search-padding: var(--van-padding-sm) 0;
+  --van-switch-size: 22px;
 }
 
 body {
-    font-family: -apple-system, 'Inter', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    line-height: 1.5;
+  font-family: -apple-system, 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
 
-    background: var(--van-background);
-    color: var(--van-text-color);
+  background: var(--van-background);
+  color: var(--van-text-color);
 }
 
-a, a:visited {
-    color: var(--van-primary-color);
+a,
+a:visited {
+  color: var(--van-primary-color);
 }
 
 blockquote {
-    margin: 0;
+  margin: 0;
 }
 
 blockquote p {
-    padding: 15px;
-    background: #eee;
-    border-radius: 5px;
+  padding: 15px;
+  background: #eee;
+  border-radius: 5px;
 }
 
 .gmi {
-    position: relative;
-    display: inline-block;
-    font-family: 'Material Icons',serif;
-    font-style: normal;
-    font-variant: normal;
-    font-weight: normal;
-    text-rendering: auto;
-    vertical-align: middle;
+  position: relative;
+  display: inline-block;
+  font-family: 'Material Icons', serif;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  text-rendering: auto;
+  vertical-align: middle;
 }
 
 .gmi-settings::before {
-    content: 'settings';
+  content: 'settings';
 }
 
 .gmi-calendar_view_month::before {
-    content: 'calendar_view_month';
+  content: 'calendar_view_month';
 }

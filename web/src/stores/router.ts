@@ -1,25 +1,24 @@
 import { defineStore } from 'pinia';
-import {ref} from "vue";
-import {showNotify} from "vant";
+import { ref } from 'vue';
+import { showNotify } from 'vant';
 
 export const useRouterStore = defineStore('router', () => {
-    const successMessageAfter = ref('');
+  const successMessageAfter = ref('');
 
-    function onRouterAfterEach() {
-        if (successMessageAfter.value != '') {
-            const message = successMessageAfter.value;
-            successMessageAfter.value = '';
+  function onRouterAfterEach() {
+    if (successMessageAfter.value != '') {
+      const message = successMessageAfter.value;
+      successMessageAfter.value = '';
 
-            showNotify({
-                type: 'success',
-                message,
-            });
-
-        }
+      showNotify({
+        type: 'success',
+        message,
+      });
     }
+  }
 
-    return {
-        successMessageAfter,
-        onRouterAfterEach,
-    }
+  return {
+    successMessageAfter,
+    onRouterAfterEach,
+  };
 });

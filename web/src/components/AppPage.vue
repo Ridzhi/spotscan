@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import ContentWrap from "@/components/ContentWrap.vue";
+import ContentWrap from '@/components/ContentWrap.vue';
 </script>
 
 <template>
   <div class="app-page">
     <ContentWrap>
-      <h2 v-if="$slots.title" style="margin-bottom: 0">
+      <h2
+        v-if="$slots.title"
+        style="margin-bottom: 0"
+      >
         <slot name="title" />
       </h2>
-      <div v-if="$slots['sub-title']" style="color: var(--van-text-color-2)">
+      <div
+        v-if="$slots['sub-title']"
+        style="color: var(--van-text-color-2)"
+      >
         <slot name="sub-title" />
       </div>
     </ContentWrap>

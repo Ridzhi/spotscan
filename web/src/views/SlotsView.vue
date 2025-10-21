@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import AppPage from "@/components/AppPage.vue";
-import {api} from "@/utils/api";
-import MainGap from "@/components/MainGap.vue";
+import AppPage from '@/components/AppPage.vue';
+import { api } from '@/utils/api';
+import MainGap from '@/components/MainGap.vue';
 
 const data = (await api.getUserSlots()).data.data;
 function formatDate(date: string) {
@@ -13,40 +13,59 @@ function formatDate(date: string) {
     4: 'Чт',
     5: 'Пт',
     6: 'Сб',
-  }
+  };
   const d = new Date(date.slice(0, 10));
 
-  return `${lookup[d.getDay() as keyof typeof lookup]}, ${d.getDate()}`
+  return `${lookup[d.getDay() as keyof typeof lookup]}, ${d.getDate()}`;
 }
 </script>
 
 <template>
-<AppPage>
-  <template #title>
-    Свободные слоты
-  </template>
-  <template #sub-title>
-    С учетом ваших фильтров
-  </template>
+  <AppPage>
+    <template #title> Свободные слоты </template>
+    <template #sub-title> С учетом ваших фильтров </template>
 
-  <template v-if="data.length" v-for="(item, index) in data" :key="index">
-    <van-cell-group v-if="item.slots.length" :title="`${formatDate(item.date)}`" inset>
-      <template v-for="(slot, j) in item.slots" :key="j">
-        <van-cell :value="`#${slot.field}`" center>
-          <template #title>
-            {{ `${slot.window.start.slice(0, 5)} - ${slot.window.end.slice(0, 5)}` }}
-          </template>
-          <template #label>
-            <van-tag v-if="slot.window.fixed" plain round type="primary">
-              фикс. время
-            </van-tag>
-          </template>
-        </van-cell>
-      </template>
-    </van-cell-group>
+    <template
+      v-if="data.length"
+      v-for="(item, index) in data"
+      :key="index"
+    >
+      <van-cell-group
+        v-if="item.slots.length"
+        :title="`${formatDate(item.date)}`"
+        inset
+      >
+        <template
+          v-for="(slot, j) in item.slots"
+          :key="j"
+        >
+          <van-cell
+            :value="`#${slot.field}`"
+            center
+          >
+            <template #title>
+              {{ `${slot.window.start.slice(0, 5)} - ${slot.window.end.slice(0, 5)}` }}
+            </template>
+            <template #label>
+              <van-tag
+                v-if="slot.window.fixed"
+                plain
+                round
+                type="primary"
+              >
+                фикс. время
+              </van-tag>
+            </template>
+          </van-cell>
+        </template>
+      </van-cell-group>
 
-    <MainGap />
-  </template>
-    <van-empty v-else image="search" description="Нет подходящих слотов"/>
-</AppPage>
+      <MainGap />
+    </template>
+    <van-empty
+      v-else
+      image="search"
+      description="Нет подходящих слотов"
+    />
+  </AppPage>
 </template>

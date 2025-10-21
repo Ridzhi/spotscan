@@ -1,47 +1,45 @@
 import {
-    backButton,
-    closeMiniApp,
-    viewport,
-    miniApp,
-    initData,
-    setDebug,
-    init as initSDK,
+  backButton,
+  closeMiniApp,
+  viewport,
+  miniApp,
+  initData,
+  setDebug,
+  init as initSDK,
 } from '@telegram-apps/sdk-vue';
 
 /**
  * Initializes the application and configures its dependencies.
  */
 export function init(debug: boolean): void {
-    // Set @telegram-apps/sdk-react debug mode.
-    setDebug(debug);
+  // Set @telegram-apps/sdk-react debug mode.
+  setDebug(debug);
 
-    // Initialize special event handlers for Telegram Desktop, Android, iOS, etc.
-    // Also, configure the package.
-    initSDK();
+  // Initialize special event handlers for Telegram Desktop, Android, iOS, etc.
+  // Also, configure the package.
+  initSDK();
 
-    // Add Eruda if needed.
-    if (debug) {
-        import('eruda')
-            .then((lib) => lib.default.init())
-            .catch(console.error);
-    }
+  // Add Eruda if needed.
+  if (debug) {
+    import('eruda').then((lib) => lib.default.init()).catch(console.error);
+  }
 
-    if (!backButton.isSupported() || !miniApp.isSupported()) {
-        throw new Error('ERR_NOT_SUPPORTED');
-    }
+  if (!backButton.isSupported() || !miniApp.isSupported()) {
+    throw new Error('ERR_NOT_SUPPORTED');
+  }
 
-    // // Mount all components used in the project.
-    backButton.mount();
-    miniApp.mount();
+  // // Mount all components used in the project.
+  backButton.mount();
+  miniApp.mount();
 
-    initData.restore();
-    void viewport
-        .mount()
-        .catch(e => {
-            console.error('Something went wrong mounting the viewport', e);
-        })
-        .then(() => {
-            viewport.bindCssVars();
-            viewport.expand();
-        });
+  initData.restore();
+  void viewport
+    .mount()
+    .catch((e) => {
+      console.error('Something went wrong mounting the viewport', e);
+    })
+    .then(() => {
+      viewport.bindCssVars();
+      viewport.expand();
+    });
 }
