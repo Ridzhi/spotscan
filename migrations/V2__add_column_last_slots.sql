@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN last_slots jsonb NULL;

@@ -8,5 +8,5 @@ CREATE TABLE "user"
 );
 
 CREATE UNIQUE INDEX user_id_idx ON "user" (id);
-CREATE INDEX user_tg_user_id_id ON "user" (tg_user_id);
+CREATE UNIQUE INDEX user_tg_user_id_id ON "user" (tg_user_id);
 CREATE INDEX user_settings ON "user" USING gin (settings);

@@ -25,5 +25,5 @@ pub async fn handler(
 #[derive(Serialize, ToSchema)]
 #[schema(as = GetUserSlots)]
 pub struct Res {
-    pub data: FreeSlotsWeek,
+    pub data: SlotsWeek,
 }

@@ -7,6 +7,7 @@ enum UserIden {
     Id,
     TgUserId,
     TgUserAccessHash,
+    LastSlots,
     Settings,
     CreatedAt,
 }
@@ -16,6 +17,9 @@ impl Into<InsertValues> for User {
         vec![
             self.tg_user_id.into(),
             self.tg_user_access_hash.into(),
+            serde_json::to_value(self.last_slots)
+                .expect("impl Into<InsertValues> for User: last_slots key")
+                .into(),
             serde_json::to_value(self.settings)
                 .expect("impl Into<InsertValues> for User: settings key")
                 .into(),
@@ -33,6 +37,16 @@ impl FromRow for User {
             id: row.value(UserIden::Id, table_prefix),
             tg_user_id: row.value(UserIden::TgUserId, table_prefix),
             tg_user_access_hash: row.value(UserIden::TgUserAccessHash, table_prefix),
+            last_slots: {
+                let raw: Option<serde_json::Value> = row.value(UserIden::LastSlots, table_prefix);
+
+                if let Some(v) = raw {
+                    let res: Vec<Slot> = serde_json::from_value(v).expect("impl FromRow for User: last_slots key");
+                    Some(Slots(res))
+                } else {
+                    None
+                }
+            },
             settings: {
                 let v: serde_json::Value = row.value(UserIden::Settings, table_prefix);
                 serde_json::from_value(v).expect("impl FromRow for User: settings key")

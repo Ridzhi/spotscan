@@ -10,10 +10,10 @@ static URL: &str = "https://atlanticspot.ru/api/booking/times.php";
 type GroupId = String;
 
 #[derive(Deserialize)]
-pub struct Response(pub Vec<Slot>);
+pub struct Response(pub Vec<SSlot>);
 
-impl Into<FreeSlots> for Response {
-    fn into(self) -> FreeSlots {
+impl Into<Slots> for Response {
+    fn into(self) -> Slots {
         let mut s: HashMap<FieldNumber, Vec<TimeWindow>> = Default::default();
         let mut groups: HashSet<GroupId> = HashSet::new();
 
@@ -60,16 +60,16 @@ impl Into<FreeSlots> for Response {
                 entry.push(item.1);
             });
 
-        FreeSlots(
+        Slots(
             s.into_iter()
                 .map(|item| {
                     item.1
                         .into_iter()
-                        .map(|tw| FreeSlot {
+                        .map(|tw| Slot {
                             field: item.0,
                             window: tw,
                         })
-                        .collect::<Vec<FreeSlot>>()
+                        .collect::<Vec<Slot>>()
                 })
                 .flatten()
                 .collect(),
@@ -78,7 +78,7 @@ impl Into<FreeSlots> for Response {
 }
 
 #[derive(Deserialize)]
-pub struct Slot {
+pub struct SSlot {
     pub times: SlotTime,
     pub plgr_1: Plgr,
     pub plgr_2: Plgr,
@@ -87,7 +87,7 @@ pub struct Slot {
     pub plgr_5: Plgr,
 }
 
-impl Slot {
+impl SSlot {
     pub fn fields(&self) -> [&Plgr; 5] {
         [
             &self.plgr_1,
@@ -153,7 +153,7 @@ where
     }
 }
 
-pub async fn get_user_free_slots(state: Arc<AppState>, user: &User) -> Result<FreeSlotsWeek> {
+pub async fn get_user_free_slots(state: Arc<AppState>, user: &User) -> Result<SlotsWeek> {
     let dates = DateIter::new().into_iter().filter(|d| {
         user.settings
             .slots
@@ -162,7 +162,7 @@ pub async fn get_user_free_slots(state: Arc<AppState>, user: &User) -> Result<Fr
             .enabled
     });
 
-    let mut result: FreeSlotsWeek = Default::default();
+    let mut result: SlotsWeek = Default::default();
 
     for date in dates {
         info!(
@@ -175,7 +175,7 @@ pub async fn get_user_free_slots(state: Arc<AppState>, user: &User) -> Result<Fr
             .0
             .into_iter()
             .filter(|slot| user.match_window(date.weekday(), &slot.window))
-            .collect::<Vec<FreeSlot>>();
+            .collect::<Vec<Slot>>();
 
         if user_free_slots.is_empty() {
             continue;
@@ -185,15 +185,15 @@ pub async fn get_user_free_slots(state: Arc<AppState>, user: &User) -> Result<Fr
 
         result.0.push(FreeSlotWeek {
             date,
-            slots: FreeSlots(user_free_slots),
+            slots: Slots(user_free_slots),
         });
     }
 
     Ok(result)
 }
 
-pub async fn get_free_slots(state: Arc<AppState>, date: &OffsetDateTime) -> Result<FreeSlots> {
-    let mut s: FreeSlots = state
+pub async fn get_free_slots(state: Arc<AppState>, date: &OffsetDateTime) -> Result<Slots> {
+    let mut s: Slots = state
         .http_client()
         .get(URL)
         .query(&[(
@@ -219,7 +219,7 @@ mod tests {
     use super::*;
     #[test]
     fn parse() {
-        let s: FreeSlots =
+        let s: Slots =
             serde_json::from_str::<Response>(include_str!("../fixtures/spot_slots.json"))
                 .expect("should be ok")
                 .into();

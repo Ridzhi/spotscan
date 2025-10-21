@@ -16,7 +16,7 @@ pub type TgUserId = i64;
 pub type TgAccessHash = i64;
 pub type FieldNumber = u8;
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Hash, Eq, PartialEq, Clone, Debug)]
 pub struct AppTime(pub Time);
 
 impl From<Time> for AppTime {
@@ -50,6 +50,7 @@ pub struct User {
     pub id: i64,
     pub tg_user_id: TgUserId,
     pub tg_user_access_hash: TgAccessHash,
+    pub last_slots: Option<Slots>,
     pub settings: Settings,
     pub created_at: UtcDateTime,
 }
@@ -81,6 +82,7 @@ impl User {
             tg_user_id,
             tg_user_access_hash,
             settings: Settings::default(),
+            last_slots: None,
             created_at: Default::default(),
         }
     }
@@ -210,39 +212,44 @@ pub fn now_utc() -> PrimitiveDateTime {
     PrimitiveDateTime::new(now.date(), now.time())
 }
 
-#[derive(Serialize, Deserialize, Default, Debug, ToSchema)]
-pub struct FreeSlots(pub Vec<FreeSlot>);
+#[derive(Serialize, Deserialize, Default, Clone, Debug, ToSchema)]
+pub struct Slots(pub Vec<Slot>);
 
-impl Deref for FreeSlots {
-    type Target = Vec<FreeSlot>;
+impl Deref for Slots {
+    type Target = Vec<Slot>;
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, ToSchema)]
-pub struct FreeSlot{
+#[derive(Serialize, Deserialize, Clone, Debug, Hash, Eq, PartialEq, ToSchema)]
+pub struct Slot {
     pub field: FieldNumber,
     pub window: TimeWindow,
 }
 
 #[derive(Serialize, Deserialize, Default, Debug ,ToSchema)]
-pub struct FreeSlotsWeek(pub Vec<FreeSlotWeek>);
+pub struct SlotsWeek(pub Vec<FreeSlotWeek>);
+
+pub enum SlotStatus {
+    Booked,
+    Freed,
+}
 
 #[derive(Serialize, Deserialize, Debug ,ToSchema)]
 pub struct FreeSlotWeek {
     pub date: OffsetDateTime,
-    pub slots: FreeSlots,
+    pub slots: Slots,
 }
 
-impl Deref for FreeSlotsWeek {
+impl Deref for SlotsWeek {
     type Target = Vec<FreeSlotWeek>;
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
-impl DerefMut for FreeSlotsWeek {
+impl DerefMut for SlotsWeek {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }
@@ -285,7 +292,7 @@ impl Iterator for DateIter {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, ToSchema)]
+#[derive(Serialize, Deserialize, Clone, Hash, Eq, PartialEq, Debug, ToSchema)]
 pub struct TimeWindow {
     pub fixed: bool,
     pub start: AppTime,

@@ -1,10 +1,9 @@
-use grammers_client::{Client as TgClient, InputMessage, InvocationError};
+use std::collections::HashSet;
+use grammers_client::{Client as TgClient, InputMessage};
 use log::{error, info};
-use reqwest;
 use spotscan::{prelude::*, spot};
 use std::ops::Add;
 use std::sync::Arc;
-use grammers_client::types::Message;
 use time::{
     Duration, OffsetDateTime, Weekday,
     macros::{format_description, offset},
@@ -47,7 +46,7 @@ async fn handler(
     bot: &TgClient,
     date: OffsetDateTime,
 ) -> Result<()> {
-    let users = state
+    let mut users = state
         .user_store()
         .find_many(vec![UserOption::Enabled(date.weekday())])
         .await?;
@@ -58,15 +57,52 @@ async fn handler(
 
     let free_slots = spot::get_free_slots(state.clone(), &date).await?;
 
-    for user in users {
-        let body = free_slots
-            .iter()
+    for mut user in users {
+        let user_free_slots = free_slots.0.clone()
+            .into_iter()
             .filter(|slot| user.match_window(date.weekday(), &slot.window))
-            .map(|slot| create_message(slot.field, &slot.window))
-            .collect::<Vec<String>>();
+            .collect::<Vec<_>>();
+
+        let body = if let Some(v) = &user.last_slots {
+            let last = v.iter().collect::<HashSet<_>>();
+            let curr = user_free_slots.iter().collect::<HashSet<_>>();
+
+            let booked = last.difference(&curr).collect::<Vec<_>>();
+            let freed = curr.difference(&last).collect::<Vec<_>>();
+
+            if booked.is_empty() && freed.is_empty() {
+                info!("user{} no updates", &user.tg_user_id);
+                continue;
+            }
+
+            // actually not show booked slots(need to merge booked for impl),
+            user_free_slots
+                .iter()
+                .map(|slot| {
+                    let status: Option<SlotStatus> = if booked.contains(&&slot) {
+                        Some(SlotStatus::Booked)
+                    } else if freed.contains(&&slot) {
+                        Some(SlotStatus::Freed)
+                    } else {
+                        None
+                    };
+
+                    create_message(slot.field, &slot.window, status)
+                })
+                .collect::<Vec<String>>()
+
+        } else {
+            user_free_slots
+                .iter()
+                .map(|slot| create_message(slot.field, &slot.window, None))
+                .collect::<Vec<String>>()
+        };
+
+        user.last_slots = Some(Slots(user_free_slots));
+        user = state.user_store().update(user).await?;
 
         if body.is_empty() {
-            info!("No available slots for user {}, skip", user.tg_user_id);
+            info!("no available slots for user {}, skip", &user.tg_user_id);
             continue;
         }
 
@@ -77,7 +113,7 @@ async fn handler(
             InputMessage::new().text(tg_message.clone()),
         )
         .await {
-            Ok(v) => {}
+            Ok(_) => {}
             Err(e) => {
                 error!("bot.send_message: {}, message {}", e, tg_message);
             }
@@ -87,8 +123,8 @@ async fn handler(
     Ok(())
 }
 
-fn create_message(f: FieldNumber, w: &TimeWindow) -> String {
-    format!(
+fn create_message(f: FieldNumber, w: &TimeWindow, status: Option<SlotStatus>) -> String {
+    let m = format!(
         "{}-{} #{} ",
         w.start
             .format(format_description!("[hour]:[minute]"))
@@ -97,7 +133,17 @@ fn create_message(f: FieldNumber, w: &TimeWindow) -> String {
             .format(format_description!("[hour]:[minute]"))
             .unwrap(),
         f,
-    )
+    );
+
+    match status {
+        None => m,
+        Some(SlotStatus::Booked) => {
+            format!("{} (заняли)", m)
+        },
+        Some(SlotStatus::Freed) => {
+            format!("{} (освободили)", m)
+        },
+    }
 }
 
 fn get_message_date(date: &OffsetDateTime) -> String {
