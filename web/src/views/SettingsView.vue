@@ -66,7 +66,7 @@ async function onSwitchDayEnabled(day: Weekday, enabled: boolean) {
   <AppPage>
     <template #title> Настройки </template>
 
-    <van-cell-group inset>
+    <van-cell-group inset v-show="false">
       <van-cell
         center
         title="Уведомления включены"
@@ -81,7 +81,7 @@ async function onSwitchDayEnabled(day: Weekday, enabled: boolean) {
       </van-cell>
     </van-cell-group>
 
-    <MainGap />
+    <MainGap inset v-show="false" />
 
     <van-cell-group
       inset
