@@ -2,6 +2,7 @@ use crate::prelude::*;
 use log::info;
 use serde::{Deserialize, de::Deserializer};
 use std::collections::{HashMap, HashSet};
+use std::ops::Deref;
 use std::sync::Arc;
 use time::{OffsetDateTime, Time, macros::format_description};
 
@@ -37,6 +38,11 @@ impl From<Response> for Slots {
                             }
 
                             if let Some(t) = &v.group_time {
+                                // it's possible because human can wrong while setup schedule
+                                if t.is_empty() {
+                                    continue;
+                                }
+
                                 groups.insert(v.group_id.clone());
 
                                 let gt: TimeWindow = t.clone().into_time_window(true);
@@ -78,7 +84,7 @@ impl From<Response> for Slots {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct SSlot {
     pub times: SlotTime,
     pub plgr_1: Plgr,
@@ -100,7 +106,7 @@ impl SSlot {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct Plgr {
     pub price: String,
     pub free: bool,
@@ -108,15 +114,23 @@ pub struct Plgr {
     pub group: Option<PlgrGroup>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct PlgrGroup {
     pub group_id: String,
     pub group_time: Option<SlotTime>,
     pub group_duration: u8,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct SlotTime(pub String);
+
+impl Deref for SlotTime {
+    type Target = String;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 impl SlotTime {
     fn into_time_window(self, fixed: bool) -> TimeWindow {
@@ -219,12 +233,12 @@ mod tests {
     use super::*;
     use std::fs::File;
     use std::io::Write;
+
     #[test]
     fn parse() {
-        let s: Slots =
-            serde_json::from_str::<Response>(include_str!("../fixtures/spot_slots.json"))
-                .expect("should be ok")
-                .into();
+        let s: Slots = serde_json::from_str::<Response>(include_str!("../fixtures/failed.json"))
+            .expect("should be ok")
+            .into();
         println!("{:?}", s);
 
         let mut file =
