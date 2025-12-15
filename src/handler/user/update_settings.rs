@@ -1,6 +1,6 @@
 use super::*;
 use std::collections::HashMap;
-use time::{Duration};
+use time::Duration;
 
 #[utoipa::path(
     patch,
@@ -51,7 +51,7 @@ pub async fn handler(
     }
 
     if let Some(v) = req.slots {
-        v.into_iter().for_each(|(day ,settings)| {
+        v.into_iter().for_each(|(day, settings)| {
             *user.settings.slots.get_mut(&day).unwrap() = settings;
         });
     }
@@ -77,4 +77,3 @@ pub struct Req {
 pub struct Res {
     pub data: User,
 }
-

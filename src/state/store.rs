@@ -1,3 +1,5 @@
+pub mod user;
+
 use crate::prelude::*;
 use deadpool_postgres::Pool;
 use sea_query::{Expr, Iden, PostgresQueryBuilder, Query, SimpleExpr};
@@ -7,9 +9,7 @@ use strum::{EnumIter, IntoEnumIterator};
 use tokio_postgres::Row;
 use tokio_postgres::types::FromSql;
 
-pub use self::{user::UserStore};
-
-pub mod user;
+pub use self::user::UserStore;
 
 type InsertValues = Vec<SimpleExpr>;
 

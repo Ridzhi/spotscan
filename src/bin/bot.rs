@@ -1,12 +1,12 @@
-use spotscan::prelude::*;
-use std::{pin::pin, sync::Arc};
 use futures_util::future::{Either, select};
 use grammers_client::{
     Client, Config, InitParams, Update, grammers_tl_types as tl,
-    session::{Session},
+    session::Session,
     types::{PackedChat, chat::Chat},
 };
 use log::{error, info, warn};
+use spotscan::prelude::*;
+use std::{pin::pin, sync::Arc};
 
 use tokio::{runtime, task};
 
@@ -14,7 +14,7 @@ const SESSION_FILE: &str = "bot.session";
 
 fn main() -> Result<()> {
     env_logger::init();
-    
+
     runtime::Builder::new_current_thread()
         .enable_all()
         .build()

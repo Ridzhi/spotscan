@@ -13,6 +13,8 @@ pub enum ErrorKind {
     OnFirstVisitUserSaveFailed,
     #[error("on first visit user find failed")]
     OnFirstVisitUserFindFailed,
+    #[error("spot failed: `{0}`")]
+    Spot(String),
 }
 
 pub type Result<T, E = AppError> = std::result::Result<T, E>;

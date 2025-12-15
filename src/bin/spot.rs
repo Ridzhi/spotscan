@@ -1,7 +1,7 @@
-use std::collections::HashSet;
 use grammers_client::{Client as TgClient, InputMessage};
 use log::{error, info};
 use spotscan::{prelude::*, spot};
+use std::collections::HashSet;
 use std::ops::Add;
 use std::sync::Arc;
 use time::{
@@ -39,11 +39,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 }
 
-async fn handler(
-    state: Arc<AppState>,
-    bot: &TgClient,
-    date: OffsetDateTime,
-) -> Result<()> {
+async fn handler(state: Arc<AppState>, bot: &TgClient, date: OffsetDateTime) -> Result<()> {
     let users = state
         .user_store()
         .find_many(vec![UserOption::Enabled(date.weekday())])
@@ -56,7 +52,9 @@ async fn handler(
     let free_slots = spot::get_free_slots(state.clone(), &date).await?;
 
     for mut user in users {
-        let user_free_slots = free_slots.0.clone()
+        let user_free_slots = free_slots
+            .0
+            .clone()
             .into_iter()
             .filter(|slot| user.match_window(date.weekday(), &slot.window))
             .collect::<Vec<_>>();
@@ -88,7 +86,6 @@ async fn handler(
                     create_message(slot.field, &slot.window, status)
                 })
                 .collect::<Vec<String>>()
-
         } else {
             user_free_slots
                 .iter()
@@ -106,11 +103,10 @@ async fn handler(
 
         let tg_message = format!("{}\n{}", get_message_date(&date), body.join("\n"));
 
-        match bot.send_message(
-            user,
-            InputMessage::new().text(tg_message.clone()),
-        )
-        .await {
+        match bot
+            .send_message(user, InputMessage::new().text(tg_message.clone()))
+            .await
+        {
             Ok(_) => {}
             Err(e) => {
                 error!("bot.send_message: {}, message {}", e, tg_message);
@@ -137,10 +133,10 @@ fn create_message(f: FieldNumber, w: &TimeWindow, status: Option<SlotStatus>) ->
         None => m,
         Some(SlotStatus::Booked) => {
             format!("{} (заняли)", m)
-        },
+        }
         Some(SlotStatus::Freed) => {
             format!("{} (освободили)", m)
-        },
+        }
     }
 }
 

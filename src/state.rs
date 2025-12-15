@@ -1,12 +1,14 @@
-use self::config::Config;
-use deadpool_postgres::Pool;
-use std::sync::{Arc, OnceLock};
-use grammers_client::{Client as TgClient, InitParams};
-use grammers_client::session::Session;
-use store::*;
-
 pub mod config;
 pub mod store;
+
+use crate::{prelude::*};
+use self::config::Config;
+use deadpool_postgres::Pool;
+use grammers_client::session::Session;
+use grammers_client::{Client as TgClient, InitParams};
+use std::sync::{Arc, OnceLock};
+use store::*;
+
 
 pub struct AppState {
     config: Factory<Arc<Config>>,
@@ -78,13 +80,23 @@ pub async fn factory_bot_client(state: Arc<AppState>) -> TgClient {
             ..Default::default()
         },
     })
-        .await.expect("bot cant connect");
+    .await
+    .expect("bot cant connect");
 
+    if !client
+        .is_authorized()
+        .await
+        .expect("client.is_authorized()")
+    {
+        client
+            .bot_sign_in(state.config().tg.bottoken.as_str())
+            .await
+            .expect("client.bot_sign_in");
 
-    if !client.is_authorized().await.expect("client.is_authorized()") {
-        client.bot_sign_in(state.config().tg.bottoken.as_str()).await.expect("client.bot_sign_in");
-
-        client.session().save_to_file(session_file).expect("bot cant save session file");
+        client
+            .session()
+            .save_to_file(session_file)
+            .expect("bot cant save session file");
     }
 
     client

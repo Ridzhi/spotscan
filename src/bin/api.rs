@@ -1,21 +1,18 @@
 use std::fs;
 use std::sync::Arc;
 
+use axum::routing::get;
+use spotscan::{handler, prelude::*};
 use tower::ServiceBuilder;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
-use axum::{routing::get};
-use utoipa::{OpenApi};
-use utoipa_axum::{router::{OpenApiRouter}};
+use utoipa::OpenApi;
+use utoipa_axum::router::OpenApiRouter;
 use utoipa_scalar::{Scalar, Servable as ScalarServable};
-use spotscan::{handler, prelude::*};
 
 #[tokio::main]
 async fn main() {
     #[derive(OpenApi)]
-    #[openapi(
-        info(title = "spotscan", license(identifier = "GPL")),
-
-    )]
+    #[openapi(info(title = "spotscan", license(identifier = "GPL")))]
     struct ApiDoc;
 
     tracing_subscriber::fmt::init();
@@ -29,7 +26,7 @@ async fn main() {
     let config = state.config().clone();
 
     let (app, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
-        .route("/ping", get(async || { "pong"}))
+        .route("/ping", get(async || "pong"))
         .nest("/v1/user", handler::user::router_v1(state.clone()))
         .nest("/v1/spot", handler::spot::router_v1(state.clone()))
         .layer(
@@ -39,7 +36,7 @@ async fn main() {
         )
         .split_for_parts();
 
-    let _ = fs::write("./docs/openapi.json", api.to_pretty_json().unwrap()) ;
+    let _ = fs::write("./docs/openapi.json", api.to_pretty_json().unwrap());
 
     let app = app.merge(Scalar::with_url("/doc/api", api));
 

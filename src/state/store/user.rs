@@ -1,5 +1,5 @@
-use sea_query::{SimpleExpr, Value};
 use super::*;
+use sea_query::{SimpleExpr, Value};
 
 #[derive(Iden, EnumIter)]
 #[iden = "user"]
@@ -48,7 +48,8 @@ impl FromRow for User {
                 let raw: Option<serde_json::Value> = row.value(UserIden::LastSlots, table_prefix);
 
                 if let Some(v) = raw {
-                    let res: Option<Vec<Slot>> = serde_json::from_value(v).expect("impl FromRow for User: last_slots key");
+                    let res: Option<Vec<Slot>> =
+                        serde_json::from_value(v).expect("impl FromRow for User: last_slots key");
 
                     res.map(Slots)
                 } else {
@@ -95,7 +96,7 @@ impl UserStore {
                 UserIden::iter()
                     .skip(2)
                     .zip(<User as Into<InsertValues>>::into(v).into_iter())
-                    .collect::<Vec<(UserIden, SimpleExpr)>>()
+                    .collect::<Vec<(UserIden, SimpleExpr)>>(),
             )
             .and_where(Expr::col(UserIden::Id).eq(id))
             .returning_all()
@@ -124,8 +125,12 @@ impl UserStore {
         for o in ops {
             q.and_where(match o {
                 UserOption::TgUserId(v) => Expr::col(UserIden::TgUserId).eq(v),
-                UserOption::Enabled(v) => SimpleExpr::Custom("(settings -> 'enabled')::bool = true".to_string())
-                    .and(SimpleExpr::Custom(format!("(settings -> 'slots' -> '{v}' -> 'enabled')::bool = true"))),
+                UserOption::Enabled(v) => SimpleExpr::Custom(
+                    "(settings -> 'enabled')::bool = true".to_string(),
+                )
+                .and(SimpleExpr::Custom(format!(
+                    "(settings -> 'slots' -> '{v}' -> 'enabled')::bool = true"
+                ))),
             });
         }
 

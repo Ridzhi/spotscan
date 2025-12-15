@@ -1,3 +1,6 @@
+pub mod spot;
+pub mod user;
+
 use std::sync::Arc;
 
 use axum::{
@@ -6,15 +9,12 @@ use axum::{
     response::{IntoResponse, Response},
 };
 
-use utoipa_axum::{routes, router::{OpenApiRouter}};
-use utoipa::{ToSchema};
 use init_data_rs as tg;
 use serde_derive::{Deserialize, Serialize};
+use utoipa::ToSchema;
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::prelude::*;
-
-pub mod user;
-pub mod spot;
 
 pub struct ExtractUser(TgUser);
 
@@ -26,7 +26,9 @@ impl FromRequestParts<Arc<AppState>> for ExtractUser {
         state: &Arc<AppState>,
     ) -> Result<Self, Self::Rejection> {
         // @TODO провалидировать решение, возможно лучше через cfg сборки
-        if let Some(env) = &state.config().env && env == "dev" {
+        if let Some(env) = &state.config().env
+            && env == "dev"
+        {
             return Ok(ExtractUser(TgUser { id: 140442927 }));
         }
 
@@ -62,7 +64,11 @@ impl FromRequestParts<Arc<AppState>> for ExtractUser {
                 Err(StatusCode::UNAUTHORIZED)
             }
             Err(e) => {
-                tracing::error!("invalid tg launch params(err={}), query({:?})", e, segments[1]);
+                tracing::error!(
+                    "invalid tg launch params(err={}), query({:?})",
+                    e,
+                    segments[1]
+                );
 
                 Err(StatusCode::UNAUTHORIZED)
             }
