@@ -2,9 +2,11 @@ use crate::prelude::*;
 use log::info;
 use reqwest::Client;
 use serde::{Deserialize, de::Deserializer};
-use std::collections::{HashMap, HashSet};
-use std::ops::Deref;
-use std::sync::Arc;
+use std::{
+    collections::{HashMap, HashSet},
+    ops::Deref,
+    sync::Arc
+};
 use time::{OffsetDateTime, Time, macros::format_description};
 
 static URL: &str = "https://atlanticspot.ru/api/booking/times.php";
