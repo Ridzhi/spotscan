@@ -1,13 +1,14 @@
 use grammers_client::{Client as TgClient, InputMessage};
 use log::{error, info};
-use spotscan::{prelude::*, spot};
+use spotscan::prelude::*;
 use std::collections::HashSet;
 use std::ops::Add;
 use std::sync::Arc;
 use time::{
-    Duration, OffsetDateTime, Weekday,
-    macros::{format_description, offset},
+    macros::{format_description, offset}, Duration, OffsetDateTime,
+    Weekday,
 };
+use spotscan::club::spot;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

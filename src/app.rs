@@ -1,3 +1,4 @@
+use anyhow::Context;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use std::fmt::Display;
@@ -47,5 +48,29 @@ where
 {
     fn from(value: E) -> Self {
         Self(value.into())
+    }
+}
+
+pub trait HttpGet {
+    async fn get<U, Q>(&self, url: U, query: &Q) -> Result<reqwest::Response>
+    where
+        U: reqwest::IntoUrl,
+        Q: serde::Serialize + ?Sized;
+}
+
+impl HttpGet for reqwest::Client {
+    async fn get<U, Q>(&self, url: U, query: &Q) -> Result<reqwest::Response>
+    where
+        U: reqwest::IntoUrl,
+        Q: serde::Serialize + ?Sized,
+    {
+        let res = self
+            .get(url)
+            .query(query)
+            .send()
+            .await
+            .context("HttpGet get failed")?;
+
+        Ok(res)
     }
 }

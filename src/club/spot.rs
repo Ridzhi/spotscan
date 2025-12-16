@@ -1,13 +1,14 @@
 use crate::prelude::*;
 use log::info;
-use reqwest::Client;
-use serde::{Deserialize, de::Deserializer};
+use serde::{de::Deserializer, Deserialize};
 use std::{
     collections::{HashMap, HashSet},
     ops::Deref,
-    sync::Arc
+    sync::Arc,
 };
-use time::{OffsetDateTime, Time, macros::format_description};
+use time::{macros::format_description, OffsetDateTime, Time};
+use crate::app::HttpGet;
+
 
 static URL: &str = "https://atlanticspot.ru/api/booking/times.php";
 
@@ -172,7 +173,9 @@ where
     }
 }
 
-pub async fn get_user_free_slots(state: Arc<AppState>, user: &User) -> Result<SlotsWeek> {
+pub async fn get_user_free_slots<C>(client: Arc<C>, user: &User) -> Result<SlotsWeek>
+where
+    C: HttpGet {
     let dates = DateIter::new().filter(|d| {
         user.settings
             .slots
@@ -189,7 +192,7 @@ pub async fn get_user_free_slots(state: Arc<AppState>, user: &User) -> Result<Sl
             user.tg_user_id, date
         );
 
-        let mut user_free_slots = get_free_slots(state.clone(), &date)
+        let mut user_free_slots = get_free_slots_v2(client.clone(), &date)
             .await?
             .0
             .into_iter()
@@ -231,6 +234,26 @@ pub async fn get_free_slots(state: Arc<AppState>, date: &OffsetDateTime) -> Resu
     Ok(s)
 }
 
+pub async fn get_free_slots_v2<C: HttpGet>(client: Arc<C>, date: &OffsetDateTime) -> Result<Slots> {
+    let mut s: Slots = client
+        .get(
+            URL,
+            &[(
+                "bookingDate",
+                date.format(format_description!("[day].[month].[year]"))
+                    .expect("date.format failed"),
+            )],
+        )
+        .await?
+        .json::<Response>()
+        .await?
+        .into();
+
+    s.0.sort_by(|a, b| a.field.cmp(&b.field));
+
+    Ok(s)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -239,13 +262,13 @@ mod tests {
 
     #[test]
     fn parse() {
-        let s: Slots = serde_json::from_str::<Response>(include_str!("../fixtures/failed.json"))
+        let s: Slots = serde_json::from_str::<Response>(include_str!("../../fixtures/failed.json"))
             .expect("should be ok")
             .into();
         println!("{:?}", s);
 
         let mut file =
-            File::create("./fixtures/free_slots_merged.json").expect("create file failed");
+            File::create("../../fixtures/free_slots_merged.json").expect("create file failed");
 
         file.write_all(serde_json::to_string(&s).unwrap().as_bytes());
     }

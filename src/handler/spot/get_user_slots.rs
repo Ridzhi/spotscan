@@ -12,7 +12,7 @@ pub async fn handler(
 ) -> Response {
     match state.user_store().find(user.id).await {
         Ok(Some(u)) => Json(Res {
-            data: spot::get_user_free_slots(state.clone(), &u)
+            data: spot::get_user_free_slots(state.http_client(), &u)
                 .await
                 .expect("get user free slots"),
         })

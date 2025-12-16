@@ -1,15 +1,15 @@
-use crate::{prelude::*};
+use crate::prelude::*;
 use grammers_client::session::PackedType;
 use grammers_client::types::PackedChat;
 use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::ops::{Add, Deref, DerefMut};
-use std::{borrow::Cow};
+use std::borrow::Cow;
 use time::macros::{offset, time};
 use time::{Duration, Time, Weekday};
 use time::{OffsetDateTime, PrimitiveDateTime};
 use tokio_postgres::types::{FromSql, ToSql};
-use utoipa::openapi::{RefOr, Schema, SchemaFormat, schema};
+use utoipa::openapi::{schema, RefOr, Schema, SchemaFormat};
 use utoipa::{PartialSchema, ToSchema};
 
 pub type TgUsername = String;
