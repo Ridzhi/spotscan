@@ -1,12 +1,12 @@
+use grammers_client::session::PackedType;
+use grammers_client::types::PackedChat;
 use serde_derive::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::ops::{Add, Deref, DerefMut};
-use grammers_client::session::PackedType;
-use grammers_client::types::PackedChat;
-use time::{OffsetDateTime, PrimitiveDateTime};
 use time::macros::{offset, time};
 use time::{Duration, Time, Weekday};
+use time::{OffsetDateTime, PrimitiveDateTime};
 use tokio_postgres::types::{FromSql, ToSql};
 use utoipa::openapi::{RefOr, Schema, SchemaFormat, schema};
 use utoipa::{PartialSchema, ToSchema};
@@ -32,6 +32,7 @@ impl Deref for AppTime {
         &self.0
     }
 }
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct AppWeekDay(pub Weekday);
 
@@ -228,7 +229,7 @@ pub struct Slot {
     pub window: TimeWindow,
 }
 
-#[derive(Serialize, Deserialize, Default, Debug ,ToSchema)]
+#[derive(Serialize, Deserialize, Default, Debug, ToSchema)]
 pub struct SlotsWeek(pub Vec<FreeSlotWeek>);
 
 pub enum SlotStatus {
@@ -236,7 +237,7 @@ pub enum SlotStatus {
     Freed,
 }
 
-#[derive(Serialize, Deserialize, Debug ,ToSchema)]
+#[derive(Serialize, Deserialize, Debug, ToSchema)]
 pub struct FreeSlotWeek {
     pub date: OffsetDateTime,
     pub slots: Slots,
@@ -264,7 +265,7 @@ pub struct DateIter {
 impl DateIter {
     pub fn new() -> Self {
         // lookup one week ahead
-        Self{
+        Self {
             now: OffsetDateTime::now_utc().to_offset(offset!(+3:00)),
             start: 0,
             end: 15,
