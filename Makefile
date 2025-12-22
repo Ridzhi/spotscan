@@ -25,6 +25,10 @@ migrate:
 api:
 	openapi-generator generate -i docs/openapi.json -g typescript-axios -o web/src/utils/openapi
 
+run-api:
+	cargo r
+un --package spotscan --bin api
+
 start:
 	cargo build --bin api --release
 	cargo build --bin bot --release

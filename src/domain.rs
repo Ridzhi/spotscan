@@ -33,6 +33,7 @@ impl Deref for AppTime {
         &self.0
     }
 }
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct AppWeekDay(pub Weekday);
 
