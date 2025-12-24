@@ -5,12 +5,23 @@ use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::ops::{Add, Deref, DerefMut};
 use std::borrow::Cow;
+use enum_dispatch::enum_dispatch;
 use time::macros::{offset, time};
 use time::{Duration, Time, Weekday};
 use time::{OffsetDateTime, PrimitiveDateTime};
 use tokio_postgres::types::{FromSql, ToSql};
 use utoipa::openapi::{schema, RefOr, Schema, SchemaFormat};
 use utoipa::{PartialSchema, ToSchema};
+
+#[enum_dispatch]
+pub trait ClubProvider {
+    async fn get_free_slots(&self, date: &OffsetDateTime) -> Result<Slots>;
+}
+
+#[enum_dispatch(ClubProvider)]
+pub enum Club {
+    Spot
+}
 
 pub type TgUsername = String;
 pub type TgUserId = i64;

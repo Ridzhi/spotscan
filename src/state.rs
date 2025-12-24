@@ -9,7 +9,6 @@ use grammers_client::{Client as TgClient, InitParams};
 use std::sync::{Arc, OnceLock};
 use store::*;
 
-
 pub struct AppState {
     config: Factory<Arc<Config>>,
     pg: Factory<Arc<Pool>>,

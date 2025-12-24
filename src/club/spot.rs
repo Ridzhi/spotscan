@@ -254,6 +254,31 @@ pub async fn get_free_slots_v2<C: HttpGet>(client: Arc<C>, date: &OffsetDateTime
     Ok(s)
 }
 
+pub struct Spot {
+    http_client: Arc<reqwest::Client>,
+}
+
+impl ClubProvider for Spot {
+    async fn get_free_slots(&self, date: &OffsetDateTime) -> Result<Slots> {
+        let mut s: Slots = self.http_client
+            .get(URL)
+            .query(&[(
+                "bookingDate",
+                date.format(format_description!("[day].[month].[year]"))
+                    .expect("date.format failed"),
+            )])
+            .send()
+            .await?
+            .json::<Response>()
+            .await?
+            .into();
+
+        s.0.sort_by(|a, b| a.field.cmp(&b.field));
+
+        Ok(s)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
