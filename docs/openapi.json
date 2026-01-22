@@ -10,7 +10,7 @@
     "version": "0.1.0"
   },
   "paths": {
-    "/v1/spot/slots": {
+    "/v1/club/slots": {
       "get": {
         "operationId": "get_user_slots",
         "responses": {

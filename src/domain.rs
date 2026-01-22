@@ -1,16 +1,17 @@
 use crate::prelude::*;
+use enum_dispatch::enum_dispatch;
 use grammers_client::session::PackedType;
 use grammers_client::types::PackedChat;
+use log::info;
 use serde_derive::{Deserialize, Serialize};
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::ops::{Add, Deref, DerefMut};
-use std::borrow::Cow;
-use enum_dispatch::enum_dispatch;
 use time::macros::{offset, time};
 use time::{Duration, Time, Weekday};
 use time::{OffsetDateTime, PrimitiveDateTime};
 use tokio_postgres::types::{FromSql, ToSql};
-use utoipa::openapi::{schema, RefOr, Schema, SchemaFormat};
+use utoipa::openapi::{RefOr, Schema, SchemaFormat, schema};
 use utoipa::{PartialSchema, ToSchema};
 
 #[enum_dispatch]
@@ -19,8 +20,49 @@ pub trait ClubProvider {
 }
 
 #[enum_dispatch(ClubProvider)]
+#[derive(Clone)]
 pub enum Club {
-    Spot
+    Spot,
+}
+
+pub async fn get_user_free_slots(club: &impl ClubProvider, user: &User) -> Result<SlotsWeek> {
+    let dates = DateIter::new().filter(|d| {
+        user.settings
+            .slots
+            .get(&d.weekday().into())
+            .expect("user setting: slots init invalid")
+            .enabled
+    });
+
+    let mut result: SlotsWeek = Default::default();
+
+    for date in dates {
+        info!(
+            "getting user({}) free slots: date={:?}",
+            user.tg_user_id, date
+        );
+
+        let mut user_free_slots = club
+            .get_free_slots(&date)
+            .await?
+            .0
+            .into_iter()
+            .filter(|slot| user.match_window(date.weekday(), &slot.window))
+            .collect::<Vec<Slot>>();
+
+        if user_free_slots.is_empty() {
+            continue;
+        }
+
+        user_free_slots.sort_by(|a, b| a.window.start.cmp(&b.window.start));
+
+        result.0.push(FreeSlotWeek {
+            date,
+            slots: Slots(user_free_slots),
+        });
+    }
+
+    Ok(result)
 }
 
 pub type TgUsername = String;

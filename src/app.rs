@@ -1,4 +1,3 @@
-use anyhow::Context;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use std::fmt::Display;
@@ -31,9 +30,7 @@ impl Display for AppError {
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        // здесь можно обозначить свою структуру
-        // и проконтролить что мы возвращаем на клиент как есть а что нет
-
+        // @TODO add logic to distinguish public and private errors and return corresponding http code
         (
             StatusCode::INTERNAL_SERVER_ERROR,
             format!("Something went wrong: {}", self.0),
@@ -48,29 +45,5 @@ where
 {
     fn from(value: E) -> Self {
         Self(value.into())
-    }
-}
-
-pub trait HttpGet {
-    async fn get<U, Q>(&self, url: U, query: &Q) -> Result<reqwest::Response>
-    where
-        U: reqwest::IntoUrl,
-        Q: serde::Serialize + ?Sized;
-}
-
-impl HttpGet for reqwest::Client {
-    async fn get<U, Q>(&self, url: U, query: &Q) -> Result<reqwest::Response>
-    where
-        U: reqwest::IntoUrl,
-        Q: serde::Serialize + ?Sized,
-    {
-        let res = self
-            .get(url)
-            .query(query)
-            .send()
-            .await
-            .context("HttpGet get failed")?;
-
-        Ok(res)
     }
 }

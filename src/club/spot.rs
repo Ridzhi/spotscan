@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use log::info;
 use serde::{de::Deserializer, Deserialize};
 use std::{
     collections::{HashMap, HashSet},
@@ -7,15 +6,45 @@ use std::{
     sync::Arc,
 };
 use time::{macros::format_description, OffsetDateTime, Time};
-use crate::app::HttpGet;
-
 
 static URL: &str = "https://atlanticspot.ru/api/booking/times.php";
+
+#[derive(Clone)]
+pub struct Spot {
+    http_client: Arc<reqwest::Client>,
+}
+
+impl Spot {
+    pub fn new(http_client: Arc<reqwest::Client>) -> Self {
+        Self { http_client }
+    }
+}
+
+impl ClubProvider for Spot {
+    async fn get_free_slots(&self, date: &OffsetDateTime) -> Result<Slots> {
+        let mut s: Slots = self.http_client
+            .get(URL)
+            .query(&[(
+                "bookingDate",
+                date.format(format_description!("[day].[month].[year]"))
+                    .expect("date.format failed"),
+            )])
+            .send()
+            .await?
+            .json::<Response>()
+            .await?
+            .into();
+
+        s.0.sort_by(|a, b| a.field.cmp(&b.field));
+
+        Ok(s)
+    }
+}
 
 type GroupId = String;
 
 #[derive(Deserialize)]
-pub struct Response(pub Vec<SSlot>);
+struct Response(pub Vec<RawSlot>);
 
 impl From<Response> for Slots {
     fn from(response: Response) -> Slots {
@@ -89,7 +118,7 @@ impl From<Response> for Slots {
 }
 
 #[derive(Deserialize, Debug, Clone)]
-pub struct SSlot {
+struct RawSlot {
     pub times: SlotTime,
     pub plgr_1: Plgr,
     pub plgr_2: Plgr,
@@ -98,7 +127,7 @@ pub struct SSlot {
     pub plgr_5: Plgr,
 }
 
-impl SSlot {
+impl RawSlot {
     pub fn fields(&self) -> [&Plgr; 5] {
         [
             &self.plgr_1,
@@ -111,22 +140,22 @@ impl SSlot {
 }
 
 #[derive(Deserialize, Clone, Debug)]
-pub struct Plgr {
-    pub price: String,
+struct Plgr {
+    // pub price: String,
     pub free: bool,
     #[serde(deserialize_with = "deserialize_group")]
     pub group: Option<PlgrGroup>,
 }
 
 #[derive(Deserialize, Clone, Debug)]
-pub struct PlgrGroup {
+struct PlgrGroup {
     pub group_id: String,
     pub group_time: Option<SlotTime>,
-    pub group_duration: u8,
+    // pub group_duration: u8,
 }
 
 #[derive(Deserialize, Clone, Debug)]
-pub struct SlotTime(pub String);
+struct SlotTime(pub String);
 
 impl Deref for SlotTime {
     type Target = String;
@@ -170,112 +199,6 @@ where
         Ok(Case::Target(v)) => Ok(Some(v)),
         Ok(Case::EmptyVec(_)) => Ok(None),
         Err(err) => Err(err),
-    }
-}
-
-pub async fn get_user_free_slots<C>(client: Arc<C>, user: &User) -> Result<SlotsWeek>
-where
-    C: HttpGet {
-    let dates = DateIter::new().filter(|d| {
-        user.settings
-            .slots
-            .get(&d.weekday().into())
-            .unwrap()
-            .enabled
-    });
-
-    let mut result: SlotsWeek = Default::default();
-
-    for date in dates {
-        info!(
-            "Getting user({}) free slots: date={:?}",
-            user.tg_user_id, date
-        );
-
-        let mut user_free_slots = get_free_slots_v2(client.clone(), &date)
-            .await?
-            .0
-            .into_iter()
-            .filter(|slot| user.match_window(date.weekday(), &slot.window))
-            .collect::<Vec<Slot>>();
-
-        if user_free_slots.is_empty() {
-            continue;
-        }
-
-        user_free_slots.sort_by(|a, b| a.window.start.cmp(&b.window.start));
-
-        result.0.push(FreeSlotWeek {
-            date,
-            slots: Slots(user_free_slots),
-        });
-    }
-
-    Ok(result)
-}
-
-pub async fn get_free_slots(state: Arc<AppState>, date: &OffsetDateTime) -> Result<Slots> {
-    let mut s: Slots = state
-        .http_client()
-        .get(URL)
-        .query(&[(
-            "bookingDate",
-            date.format(format_description!("[day].[month].[year]"))
-                .expect("date.format failed"),
-        )])
-        .send()
-        .await?
-        .json::<Response>()
-        .await?
-        .into();
-
-    s.0.sort_by(|a, b| a.field.cmp(&b.field));
-
-    Ok(s)
-}
-
-pub async fn get_free_slots_v2<C: HttpGet>(client: Arc<C>, date: &OffsetDateTime) -> Result<Slots> {
-    let mut s: Slots = client
-        .get(
-            URL,
-            &[(
-                "bookingDate",
-                date.format(format_description!("[day].[month].[year]"))
-                    .expect("date.format failed"),
-            )],
-        )
-        .await?
-        .json::<Response>()
-        .await?
-        .into();
-
-    s.0.sort_by(|a, b| a.field.cmp(&b.field));
-
-    Ok(s)
-}
-
-pub struct Spot {
-    http_client: Arc<reqwest::Client>,
-}
-
-impl ClubProvider for Spot {
-    async fn get_free_slots(&self, date: &OffsetDateTime) -> Result<Slots> {
-        let mut s: Slots = self.http_client
-            .get(URL)
-            .query(&[(
-                "bookingDate",
-                date.format(format_description!("[day].[month].[year]"))
-                    .expect("date.format failed"),
-            )])
-            .send()
-            .await?
-            .json::<Response>()
-            .await?
-            .into();
-
-        s.0.sort_by(|a, b| a.field.cmp(&b.field));
-
-        Ok(s)
     }
 }
 

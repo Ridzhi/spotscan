@@ -5,7 +5,7 @@ All URIs are relative to *http://localhost*
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
 |[**getUser**](#getuser) | **GET** /v1/user | |
-|[**getUserSlots**](#getuserslots) | **GET** /v1/spot/slots | |
+|[**getUserSlots**](#getuserslots) | **GET** /v1/club/slots | |
 |[**updateUserSettings**](#updateusersettings) | **PATCH** /v1/user/settings | |
 
 # **getUser**

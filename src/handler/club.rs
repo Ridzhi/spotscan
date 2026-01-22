@@ -1,5 +1,4 @@
 use super::*;
-use crate::club::spot;
 
 mod get_user_slots;
 

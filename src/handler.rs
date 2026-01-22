@@ -1,5 +1,5 @@
-pub mod spot;
 pub mod user;
+pub mod club;
 
 use std::sync::Arc;
 

@@ -11,7 +11,7 @@ export $(shell sed 's/=.*//' $(ENV_FILE))
 export DB_URI=$(PG_DSN)
 
 default:
-$(info Commands: up,down,migrate)
+$(info Commands: up,down,migrate,openapi,deploy)
 
 up:
 	$(DC_CLI) up -d
@@ -22,14 +22,10 @@ down:
 migrate:
 	refinery migrate -e DB_URI -p ./migrations
 
-api:
+openapi:
 	openapi-generator generate -i docs/openapi.json -g typescript-axios -o web/src/utils/openapi
 
-run-api:
-	cargo r
-un --package spotscan --bin api
-
-start:
+deploy:
 	cargo build --bin api --release
 	cargo build --bin bot --release
 	cargo build --bin spot --release

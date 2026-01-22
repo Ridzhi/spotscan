@@ -14,6 +14,7 @@ pub struct AppState {
     pg: Factory<Arc<Pool>>,
     user_store: Factory<Arc<UserStore>>,
     http_client: Factory<Arc<reqwest::Client>>,
+    clubs: Factory<Vec<Club>>,
 }
 
 impl AppState {
@@ -31,6 +32,10 @@ impl AppState {
 
     pub fn http_client(&self) -> Arc<reqwest::Client> {
         self.resolve(&self.http_client)
+    }
+
+    pub fn clubs(&self) -> Vec<Club> {
+        self.resolve(&self.clubs)
     }
 }
 
@@ -54,6 +59,9 @@ impl Default for AppState {
                     .expect("build http client");
 
                 Arc::new(client)
+            }),
+            clubs: Factory::once(|state| {
+                vec![Club::from(Spot::new(state.http_client().clone()))]
             }),
         }
     }

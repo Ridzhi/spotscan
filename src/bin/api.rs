@@ -28,7 +28,7 @@ async fn main() {
     let (app, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
         .route("/ping", get(async || "pong"))
         .nest("/v1/user", handler::user::router_v1(state.clone()))
-        .nest("/v1/spot", handler::spot::router_v1(state.clone()))
+        .nest("/v1/club", handler::club::router_v1(state.clone()))
         .layer(
             ServiceBuilder::new()
                 .layer(TraceLayer::new_for_http())

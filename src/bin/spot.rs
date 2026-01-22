@@ -8,7 +8,6 @@ use time::{
     macros::{format_description, offset}, Duration, OffsetDateTime,
     Weekday,
 };
-use spotscan::club::spot;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -50,7 +49,12 @@ async fn handler(state: Arc<AppState>, bot: &TgClient, date: OffsetDateTime) -> 
         return Ok(());
     }
 
-    let free_slots = spot::get_free_slots(state.clone(), &date).await?;
+    let clubs = state.clubs();
+    // @TODO refactor when multi clubs supports done
+    #[allow(clippy::get_first)]
+    let spot = clubs.get(0).expect("spot expected");
+
+    let free_slots = spot.get_free_slots(&date).await?;
 
     for mut user in users {
         let user_free_slots = free_slots
